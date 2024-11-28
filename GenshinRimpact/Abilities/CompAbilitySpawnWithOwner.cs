@@ -1,0 +1,40 @@
+﻿using RimWorld;
+using Verse;
+
+namespace GenshinRimpact
+{
+    public class CompProperties_AbilitySpawnWithOwner : CompProperties_AbilityEffect
+    {
+        public ThingDef thingDef;
+        public bool allowOnBuildings = true;
+        public CompProperties_AbilitySpawnWithOwner() => compClass = typeof(CompAbilitySpawnWithOwner);
+    }
+
+    [HotSwap.HotSwappable]
+    public class CompAbilitySpawnWithOwner : CompAbilityEffect // Use this for Keqing teleports or something similar
+    {
+        public new CompProperties_AbilitySpawnWithOwner Props => (CompProperties_AbilitySpawnWithOwner)props;
+
+        public override void Apply(LocalTargetInfo target, LocalTargetInfo dest)
+        {
+            base.Apply(target, dest);
+            Thing t = GenSpawn.Spawn(Props.thingDef, target.Cell, parent.pawn.Map);
+            var comp = t.TryGetComp<CompHasOwner>();
+            if (comp != null) comp.owner = parent.pawn;
+            else Log.Error(t.ToString() + " does not have CompHasOwner");
+        }
+
+        public override bool Valid(LocalTargetInfo target, bool throwMessages = false)
+        {
+            if (target.Cell.Filled(parent.pawn.Map) || (!Props.allowOnBuildings && target.Cell.GetEdifice(parent.pawn.Map) != null))
+            {
+                if (throwMessages)
+                {
+                    Messages.Message("CannotUseAbility".Translate(parent.def.label) + ": " + "AbilityOccupiedCells".Translate(), target.ToTargetInfo(parent.pawn.Map), MessageTypeDefOf.RejectInput, historical: false);
+                }
+                return false;
+            }
+            return true;
+        }
+    }
+}

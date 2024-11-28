@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props" Condition="Exists('..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{8AED77EA-FB6D-4C17-8E14-022ABB808C9F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GenshinRimpact</RootNamespace>
+    <AssemblyName>GenshinRimpact</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\..\..\Program Files %28x86%29\Steam\steamapps\common\RimWorld\Mods\___GenshinRimpact\Assemblies\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Publicize Include="Assembly-CSharp:Verse.Projectile.landed" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\workshop\content\294100\2009463077\Current\Assemblies\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="HotSwap">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\HotSwap-1.5\Assemblies\HotSwap.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Abilities\CompAbilityAoE.cs" />
+    <Compile Include="Abilities\CompAbilityStackOffset.cs" />
+    <Compile Include="Abilities\CompAbilityCooldownTimer.cs" />
+    <Compile Include="Abilities\CompAbilityDash.cs" />
+    <Compile Include="Abilities\CompAbilityKnockback.cs" />
+    <Compile Include="Abilities\CompAbilitySpawnWithOwner.cs" />
+    <Compile Include="Abilities\CompAbilityTeleport.cs" />
+    <Compile Include="Abilities\CompAbilityStackHandler.cs" />
+    <Compile Include="Abilities\Verb_AbilityShootMaxRange.cs" />
+    <Compile Include="DevTools\DevTools.cs" />
+    <Compile Include="Elements\ElementDef.cs" />
+    <Compile Include="GenshinRimpact.cs" />
+    <Compile Include="HediffComps\HediffComp_AoE.cs" />
+    <Compile Include="HediffComps\HediffComp_ChargingAbility.cs" />
+    <Compile Include="HediffComps\HediffComp_SeverityPerSecond.cs" />
+    <Compile Include="HediffComps\HediffComp_Shield.cs" />
+    <Compile Include="HediffComps\HediffComp_TendAndRegen.cs" />
+    <Compile Include="HediffComps\HediffComp_TurretGun.cs" />
+    <Compile Include="Misc\BattleLogEntry_DamageTakenAbility.cs" />
+    <Compile Include="Misc\BulletBezier.cs" />
+    <Compile Include="Misc\DashingPawn.cs" />
+    <Compile Include="ModExtensions\ModExt_Bezier.cs" />
+    <Compile Include="ModExtensions\ModExt_Element.cs" />
+    <Compile Include="Patches\Patch_Projectile_get_ExactRotation.cs" />
+    <Compile Include="Reactions\ElementalReactionDef.cs" />
+    <Compile Include="Reactions\ElementCombo.cs" />
+    <Compile Include="Reactions\ReactionData.cs" />
+    <Compile Include="Reactions\Reaction_ApplyHediff.cs" />
+    <Compile Include="Reactions\Reaction_SpawnThing.cs" />
+    <Compile Include="Reactions\Reaction_DoDamage.cs" />
+    <Compile Include="Reactions\Reaction_SpreadElement.cs" />
+    <Compile Include="ThingComps\CompElementalHandler.cs" />
+    <Compile Include="Statuses\Status.cs" />
+    <Compile Include="ThingComps\CompAnimatedOverlay.cs" />
+    <Compile Include="ThingComps\CompDecoy.cs" />
+    <Compile Include="ThingComps\CompDisappearAfterTicks.cs" />
+    <Compile Include="ThingComps\CompHasOwner.cs" />
+    <Compile Include="ThingComps\CompProjectileVFX.cs" />
+    <Compile Include="ThingComps\CompAoESpawner.cs" />
+    <Compile Include="ThingComps\CompThingSpawner.cs" />
+    <Compile Include="UI\Command_AbilityCooldownTimer.cs" />
+    <Compile Include="UI\Command_Invisible.cs" />
+    <Compile Include="UI\Gizmo_AbilityStacks.cs" />
+    <Compile Include="Utils.cs" />
+    <Compile Include="Visions\CompVisionEquippableAbilities.cs" />
+    <Compile Include="Elements\ElementColors.cs" />
+    <Compile Include="Elements\Element.cs" />
+    <Compile Include="GenshinDefOf.cs" />
+    <Compile Include="Reactions\IElementalReaction.cs" />
+    <Compile Include="Reactions\Reaction_Stun.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Visions\VisionDef.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.props'))" />
+    <Error Condition="!Exists('..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets'))" />
+  </Target>
+  <Import Project="..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets" Condition="Exists('..\packages\Krafs.Publicizer.2.2.1\build\Krafs.Publicizer.targets')" />
+</Project>
