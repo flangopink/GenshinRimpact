@@ -1,5 +1,4 @@
 ﻿using RimWorld;
-using System.Security.Cryptography;
 using UnityEngine;
 using Verse;
 
@@ -9,8 +8,8 @@ namespace GenshinRimpact
     {
         protected Ability ability;
 
-        private CompAbilityWithStacks stackComp;
-        private CompAbilityWithStacks StackComp => stackComp ??= ability.CompOfType<CompAbilityWithStacks>();
+        private CompAbilityStackHandler stackComp;
+        private CompAbilityStackHandler StackComp => stackComp ??= ability.CompOfType<CompAbilityStackHandler>();
 
         //private const float Padding = 6f;
 

@@ -7,9 +7,10 @@ namespace GenshinRimpact
     public class CompProperties_AbilityStackOffset : CompProperties_AbilityEffect
     {
         public string stackName;
-        public int offset = 1;
+        public int amount = 1;
         public bool isGiver;
-        public bool cantUseWithoutStacks;
+        public bool cantUseWhenEmpty = true;
+        public bool requiresExactAmount;
 
         public CompProperties_AbilityStackOffset() => compClass = typeof(CompAbilityStackOffset);
     }
@@ -54,16 +55,21 @@ namespace GenshinRimpact
         {
             base.PostApplied(targets, map);
             var prev = sh.currentStacks;
-            sh.OffsetStacks(Props.offset);
+            sh.OffsetStacks(Props.amount);
             var now = sh.currentStacks;
             Utils.LogMessage(Props.stackName + " stacks changed: " + prev + " -> " + now);
         }
 
         public override bool Valid(LocalTargetInfo target, bool throwMessages = false)
         {
-            if (Props.cantUseWithoutStacks && sh.currentStacks == 0)
+            if (Props.cantUseWhenEmpty && sh.currentStacks == 0)
             {
-                Messages.Message("GR_CantUseAbilityNotEnoughStacks".Translate(Props.stackName), MessageTypeDefOf.RejectInput, false);
+                Messages.Message("GR_CantUseAbilityNotEnoughStacks".Translate(Props.stackName, Props.amount), MessageTypeDefOf.RejectInput, false);
+                return false;
+            }
+            else if (Props.requiresExactAmount && sh.currentStacks - Props.amount < 0)
+            {
+                Messages.Message("GR_CantUseAbilityNotEnoughStacks_NeedAmount".Translate(Props.stackName, Props.amount), MessageTypeDefOf.RejectInput, false);
                 return false;
             }
             return base.Valid(target, throwMessages);
@@ -72,7 +78,7 @@ namespace GenshinRimpact
         public override void PostExposeData()
         {
             base.PostExposeData();
-            Scribe_References.Look(ref shab, "shab");
+            Scribe_References.Look(ref shab, "shab"); 
         }
     }
 }

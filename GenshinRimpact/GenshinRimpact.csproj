@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abilities\CompAbilityAoE.cs" />
+    <Compile Include="Abilities\CompAbilityDamageSelf.cs" />
     <Compile Include="Abilities\CompAbilityStackOffset.cs" />
     <Compile Include="Abilities\CompAbilityCooldownTimer.cs" />
     <Compile Include="Abilities\CompAbilityDash.cs" />
@@ -91,7 +92,9 @@
     <Compile Include="Misc\DashingPawn.cs" />
     <Compile Include="ModExtensions\ModExt_Bezier.cs" />
     <Compile Include="ModExtensions\ModExt_Element.cs" />
+    <Compile Include="Patches\Patch_EquipmentUtility_CanEquip.cs" />
     <Compile Include="Patches\Patch_Projectile_get_ExactRotation.cs" />
+    <Compile Include="PrivateFields.cs" />
     <Compile Include="Reactions\ElementalReactionDef.cs" />
     <Compile Include="Reactions\ElementCombo.cs" />
     <Compile Include="Reactions\ReactionData.cs" />
