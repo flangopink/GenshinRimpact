@@ -2,14 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using Verse;
 using Verse.AI;
-using static UnityEngine.GraphicsBuffer;
 
 namespace GenshinRimpact
 {
 
+    [HotSwap.HotSwappable]
     [StaticConstructorOnStartup]
     public static class Utils
     {
@@ -72,6 +73,7 @@ namespace GenshinRimpact
         }
 
         public static void LogMessage(string str) => Log.Message("<color=#f4abba>[GenshinRimpact]</color> " + str);
+        public static void LogWarning(string str) => Log.Warning("<color=#f4abba>[GenshinRimpact]</color> " + str);
         public static void LogError(string str) => Log.Error("<color=#f4abba>[GenshinRimpact]</color> " + str);
 
         public static ElementalReactionDef GetReaction(ElementDef appliedElement, ElementDef otherElement, Status status)
@@ -221,6 +223,7 @@ namespace GenshinRimpact
         public static List<IntVec3> AffectedLineCells(ref List<IntVec3> tmpCells, IntVec3 casterPos, IntVec3 targetPos, Map map, float range, Verb verb, bool canHitFilledCells = false)
         {
             tmpCells.Clear();
+            //Utils.LogMessage(targetPos.ToString());
             IntVec3 intVec = targetPos.ClampInsideMap(map);
             if (casterPos == intVec)
             {
@@ -238,12 +241,78 @@ namespace GenshinRimpact
             return tmpCells;
         }
 
-        public static IntVec3 MaxRangeIntVec3(IntVec3 dest, float range)
+        public static IntVec3 RedirectIntVec3ToMaxRange(IntVec3 casterPos, IntVec3 targetPos, Map map, float range)
+        {
+            Vector3 direction = (targetPos - casterPos).ToVector3();
+            if (direction == Vector3.zero)
+            {
+                return targetPos;
+            }
+            direction.Normalize();
+            float maxRange = range;
+            IntVec3 newTargetPos = casterPos + (direction * maxRange).ToIntVec3();
+            if (newTargetPos.InBounds(map))
+            {
+                return newTargetPos;
+            }
+            else
+            {
+                // If the furthest cell isn't valid, find the furthest valid cell in the direction.
+                for (float i = maxRange; i > 0; i--)
+                {
+                    IntVec3 potentialTargetPos = casterPos + (direction * i).ToIntVec3();
+                    if (potentialTargetPos.InBounds(map))
+                    {
+                        return potentialTargetPos;
+                    }
+                }
+                return targetPos;
+            }
+        }
+
+        public static List<IntVec3> GetCellsInRectangle(IntVec3 center, IntVec3 direction, Map map, int length, int width)
+        {
+            List<IntVec3> affectedCells = [];
+
+            // Calculate the rotation angle from the direction vector
+            float angle = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
+
+            // Create the rectangle and rotate it around the origin
+            Rect rect = new(-width / 2, -length / 2, width, length);
+            Rect rotatedRect = RotateRectangleAroundPivot(rect, Vector2.zero, angle);
+
+            // Convert the rotated rectangle to a list of affected cells
+            for (int x = Mathf.FloorToInt(rotatedRect.xMin); x <= Mathf.CeilToInt(rotatedRect.xMax); x++)
+            {
+                for (int z = Mathf.FloorToInt(rotatedRect.yMin); z <= Mathf.CeilToInt(rotatedRect.yMax); z++)
+                {
+                    var cell = center + new IntVec3(x, 0, z);
+                    if (cell.InBounds(map)) affectedCells.Add(cell);
+                }
+            }
+
+            return affectedCells;
+        }
+
+        public static Rect RotateRectangleAroundPivot(Rect rect, Vector2 pivot, float angle)
+        {
+            float sin = Mathf.Sin(angle * Mathf.Deg2Rad);
+            float cos = Mathf.Cos(angle * Mathf.Deg2Rad);
+
+            float newX = (rect.x - pivot.x) * cos - (rect.y - pivot.y) * sin + pivot.x;
+            float newY = (rect.x - pivot.x) * sin + (rect.y - pivot.y) * cos + pivot.y;
+
+            return new Rect(newX, newY, rect.width, rect.height);
+        }
+
+        /*public static IntVec3 MaxRangeIntVec3(IntVec3 dest, float range)
         {
             float sqrRange = range * range;
             float mult = sqrRange / dest.SqrMagnitude;
-            return mult > 1 ? (dest.ToVector3() * mult).ToIntVec3() : dest;
-        }
+            var result = (dest.ToVector3() * mult).ToIntVec3();
+            Utils.LogMessage(range + " ... " +dest + " ... " + sqrRange + " ... "+ dest.SqrMagnitude + " ... " + mult + " ... " + result); 
+            return mult > 1 ? result : dest;
+        }*/
 
         public static void TryDoAbility(Pawn pawn, AbilityDef abilityDef, LocalTargetInfo targetCell)
         {

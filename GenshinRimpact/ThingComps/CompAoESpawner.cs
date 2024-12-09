@@ -84,7 +84,7 @@ namespace GenshinRimpact
             {
                 Thing thing = ThingMaker.MakeThing(Props.spawnThing);
                 thing.SetFaction(parent.Faction); 
-                GenSpawn.CheckMoveItemsAside(pos, default, parent.def, map);
+                GenSpawn.CheckMoveItemsAside(pos, default, thing.def, map);
                 GenPlace.TryPlaceThing(thing, pos, map, ThingPlaceMode.Near);
             }
         }

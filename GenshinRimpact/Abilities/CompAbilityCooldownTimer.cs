@@ -14,7 +14,7 @@ namespace GenshinRimpact
     }
 
     [HotSwap.HotSwappable]
-    public class CompAbilityCooldownTimer : CompAbilityEffect
+    public class CompAbilityCooldownTimer : CompAbilityEffect   // Multiple charges with long cooldown (Diluc)
     {
         public new CompProperties_AbilityCooldownTimer Props => (CompProperties_AbilityCooldownTimer)props;
 
@@ -34,17 +34,17 @@ namespace GenshinRimpact
         public override void PostApplied(List<LocalTargetInfo> targets, Map map)
         {
             base.PostApplied(targets, map);
-            Utils.LogMessage(parent.RemainingCharges + " ... " + (parent.maxCharges - Props.startAfterUses));
-            if (parent.RemainingCharges == parent.maxCharges - Props.startAfterUses) // it goes like 2 1 3, not 2 1 0
+            //Utils.LogMessage(parent.RemainingCharges + " ... " + (parent.maxCharges - Props.startAfterUses));
+            if (parent.RemainingCharges == parent.maxCharges - Props.startAfterUses)
             {
                 timerActive = true;
                 timerLeft = Props.timerTicks;
             }
-            else if (parent.RemainingCharges == parent.maxCharges)
+            else if (parent.RemainingCharges == parent.maxCharges) // it goes like 2 1 3, not 2 1 0
             {
                 timerLeft = 0;
             }
-            Utils.LogMessage(!ShouldSetOnLongCooldown + " " + (parent.RemainingCharges != parent.maxCharges));
+           //Utils.LogMessage(!ShouldSetOnLongCooldown + " " + (parent.RemainingCharges != parent.maxCharges));
             if (!ShouldSetOnLongCooldown && parent.RemainingCharges != parent.maxCharges) StartCooldownNoRecharge(parent.def.cooldownTicksRange.RandomInRange);
         }
 

@@ -5,6 +5,7 @@ namespace GenshinRimpact
     public class CompProperties_DisappearAfterTicks : CompProperties
     {
         public int ticks = 300; // 5 sec
+        public EffecterDef effecter;
         public CompProperties_DisappearAfterTicks() => compClass = typeof(CompDisappearAfterTicks);
     }
 
@@ -25,6 +26,11 @@ namespace GenshinRimpact
             base.CompTick();
             if (ticksLeft <= 0) parent.Destroy();
             ticksLeft--;
+        }
+
+        public override void PostDestroy(DestroyMode mode, Map previousMap)
+        {
+            Props.effecter?.Spawn(parent.PositionHeld, previousMap).Cleanup();
         }
 
         public override void PostExposeData()
