@@ -17,8 +17,12 @@ namespace GenshinRimpact
         public static readonly Texture2D ClearBarTexture = BaseContent.ClearTex;
         public static readonly Texture2D DividerTex = ContentFinder<Texture2D>.Get("UI/Misc/NeedUnitDivider");
 
+        public static readonly Dictionary<ElementDef, Texture2D> ElementalFillBars = [];
+
         public static readonly Dictionary<ReactionData, Type> AllReactionsForReading = [];
         public static readonly Dictionary<ThingDef, VisionDef> AllVisionsForReading = [];
+
+        public static List<IntVec3> tmpCells = [];
 
         /*public static Color GetElementColor(Element element)
         {
@@ -57,6 +61,7 @@ namespace GenshinRimpact
                     if (typeof(ElementalReaction).IsAssignableFrom(data.reaction.reactionClass))
                         AllReactionsForReading.Add(data, data.reaction.reactionClass);
                 }
+                ElementalFillBars.AddDistinct(element, SolidColorMaterials.NewSolidColorTexture(element.color));
             }
             LogMessage("Loaded " + AllReactionsForReading.Count + " reactions!");
             foreach (var t in DefDatabase<ThingDef>.AllDefsListForReading)
@@ -241,6 +246,48 @@ namespace GenshinRimpact
             return tmpCells;
         }
 
+        public static List<IntVec3> GetHalfCircleCells(ref List<IntVec3> tmpCells, IntVec3 casterCell, IntVec3 targetCell, Map map, float radius, float angleRadians = Mathf.PI, bool filled = true)
+        {
+            tmpCells.Clear();
+            if (casterCell == targetCell)
+            {
+                return tmpCells;
+            }
+
+            float halfAngleRadians = angleRadians / 2f;
+            float startAngleRadians = Mathf.Atan2(targetCell.z - casterCell.z, targetCell.x - casterCell.x) - halfAngleRadians;
+
+            for (float angle = startAngleRadians; angle <= startAngleRadians + angleRadians; angle += 0.1f)
+            {
+                if (filled)
+                {
+                    for (int r = 0; r <= radius; r++)
+                    {
+                        int x = Mathf.RoundToInt(casterCell.x + r * Mathf.Cos(angle));
+                        int z = Mathf.RoundToInt(casterCell.z + r * Mathf.Sin(angle));
+                        IntVec3 cell = new(x, 0, z);
+
+                        if (!tmpCells.Contains(cell) && cell.InBounds(map))
+                        {
+                            tmpCells.Add(cell);
+                        }
+                    }
+                }
+                else
+                {
+                    int x = Mathf.RoundToInt(casterCell.x + radius * Mathf.Cos(angle));
+                    int z = Mathf.RoundToInt(casterCell.z + radius * Mathf.Sin(angle));
+                    IntVec3 cell = new(x, 0, z);
+
+                    if (!tmpCells.Contains(cell) && cell.InBounds(map))
+                    {
+                        tmpCells.Add(cell);
+                    }
+                }
+            }
+            return tmpCells;
+        }
+
         public static IntVec3 RedirectIntVec3ToMaxRange(IntVec3 casterPos, IntVec3 targetPos, Map map, float range)
         {
             Vector3 direction = (targetPos - casterPos).ToVector3();
@@ -331,7 +378,7 @@ namespace GenshinRimpact
             pawn.jobs.StartJob(job, JobCondition.InterruptForced);
         }
 
-        public static void DoAoEAbility(LocalTargetInfo targetCell, Pawn caster, AbilityDef abilityDef, float damageAmount = 10f, float radius = 3.9f, DamageDef damageDef = null, HediffDef hediffDef = null, float hediffSeverity = 1f, EffecterDef effecterOnTrigger = null, bool isExplosive = false, bool isDirect = false, bool canFriendlyFire = false, bool onlyAffectFriendlies = false, float explosionScreenShake = 0f, SoundDef explosionSound = null)
+        public static void DoAoEAbility(LocalTargetInfo targetCell, Pawn caster, AbilityDef abilityDef, float damageAmount = 10f, float radius = 3.9f, DamageDef damageDef = null, HediffDef hediffDef = null, float hediffSeverity = 1f, EffecterDef effecterOnTrigger = null, bool isExplosive = false, bool isDirect = false, bool canFriendlyFire = false, bool onlyAffectFriendlies = false, float explosionScreenShake = 0f, SoundDef explosionSound = null, AoEShape shape = AoEShape.Radial, float angleRad = Mathf.PI)
         {
             IntVec3 cell = targetCell.Cell;
             Map map = caster.Map;
@@ -340,16 +387,26 @@ namespace GenshinRimpact
 
             effecterOnTrigger?.Spawn(cell, map).Cleanup();
 
-            //Log.Message("Ccccccccccc");
-            //Log.Message(cell);
-
-            int cellNum = GenRadial.NumCellsInRadius(radius);
-            for (int i = 0; i < cellNum; i++)
+            List<IntVec3> cells = [];
+            switch (shape)
             {
-                IntVec3 intVec = cell + GenRadial.RadialPattern[i];
-                if (!intVec.InBounds(map)) continue;
+                case AoEShape.Radial:
+                    cells = GenRadial.RadialCellsAround(cell, radius, true).ToList();
+                    break;
+                case AoEShape.HalfRadial:
+                    GetHalfCircleCells(ref cells, caster.Position, cell, map, radius, angleRad, false); // PI/2 by default
+                    break;
+                case AoEShape.HalfRadialFilled:
+                    GetHalfCircleCells(ref cells, caster.Position, cell, map, radius, angleRad, true); // PI/2 by default
+                    break;
+            }
+            //int cellNum = GenRadial.NumCellsInRadius(radius);
+            for (int i = 0; i < cells.Count; i++)
+            {
+                //IntVec3 intVec = cell + GenRadial.RadialPattern[i];
+                if (!cells[i].InBounds(map)) continue;
 
-                List<Thing> thingList = intVec.GetThingList(map);
+                List<Thing> thingList = cells[i].GetThingList(map);
                 for (int j = 0; j < thingList.Count; j++)
                 {
                     Thing thing = thingList[j];
@@ -428,5 +485,13 @@ namespace GenshinRimpact
         Hostile = 0,
         Neutral = 1,
         All = 2
+    }
+
+    public enum AoEShape
+    {
+        Radial = 0,
+        HalfRadial = 1,
+        HalfRadialFilled = 2,
+        Rectangular = 3 // Unused for now
     }
 }

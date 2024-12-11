@@ -6,26 +6,29 @@ namespace GenshinRimpact
     public class HediffCompProperties_AoE : HediffCompProperties
     {
         public AbilityDef abilityDef;
-        public int intervalTicks = 60;
+        public DamageDef damageDef;
+        public HediffDef hediffDef;
+
         public EffecterDef effecterAttached;
         public EffecterDef effecterEnd;
         public EffecterDef effecterOnTrigger;
-        public DamageDef damageDef;
-        public HediffDef hediffDef;
+
+        public int intervalTicks = 60;
         public float hediffSeverity = 1f;
         public float damageAmount = 10f;
         public float radius = 3.9f;
+
         public bool isExplosive;
         public bool isDirect;
         public bool canFriendlyFire;
         public bool onlyAffectFriendlies;
+
+        public bool isPlunging;
+
         public float screenShakeIntensity = 1f;
         public SoundDef sound;
 
-        public HediffCompProperties_AoE()
-        {
-            compClass = typeof(HediffComp_AoE);
-        }
+        public HediffCompProperties_AoE() => compClass = typeof(HediffComp_AoE);
     }
 
     public class HediffComp_AoE : HediffComp

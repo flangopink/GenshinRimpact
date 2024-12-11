@@ -1,6 +1,8 @@
 ﻿using Verse;
 using RimWorld;
 using System.Collections.Generic;
+using UnityEngine;
+using Verse.Noise;
 
 namespace GenshinRimpact
 {
@@ -15,10 +17,14 @@ namespace GenshinRimpact
         public float radius = 3.9f;
         //public int applyDelayTicks;
         public int effecterPreCastTicks;
+
         public bool isExplosive;
         public bool isDirect;
         public bool canFriendlyFire;
         public bool onlyAffectFriendlies;
+
+        public AoEShape shape = AoEShape.Radial;
+        public float angleRad = Mathf.PI;
 
         public CompProperties_AbilityAoE() => compClass = typeof(CompAbilityAoE);
     }
@@ -28,6 +34,8 @@ namespace GenshinRimpact
     {
         public new CompProperties_AbilityAoE Props => (CompProperties_AbilityAoE)props;
 
+        public List<IntVec3> tmpCells = [];
+
         private Pawn Pawn => parent.pawn;
 
         //private int ticksLeftToApply;
@@ -35,7 +43,7 @@ namespace GenshinRimpact
         public override void Apply(LocalTargetInfo target, LocalTargetInfo dest)
         {
             base.Apply(target, dest);
-            Utils.DoAoEAbility(target, Pawn, parent.def, Props.damageAmount, Props.radius, Props.damageDef, Props.hediffDef, Props.hediffSeverity, Props.effecterOnTrigger, Props.isExplosive, Props.isDirect, Props.canFriendlyFire, Props.onlyAffectFriendlies, Props.screenShakeIntensity, Props.sound);
+            Utils.DoAoEAbility(target, Pawn, parent.def, Props.damageAmount, Props.radius, Props.damageDef, Props.hediffDef, Props.hediffSeverity, Props.effecterOnTrigger, Props.isExplosive, Props.isDirect, Props.canFriendlyFire, Props.onlyAffectFriendlies, Props.screenShakeIntensity, Props.sound, Props.shape, Props.angleRad);
         }
 
         public override IEnumerable<PreCastAction> GetPreCastActions()
@@ -51,6 +59,11 @@ namespace GenshinRimpact
                     ticksAwayFromCast = Props.effecterPreCastTicks
                 };
             }
+        }
+
+        public override void DrawEffectPreview(LocalTargetInfo target)
+        {
+            if (Props.shape != AoEShape.Radial) GenDraw.DrawFieldEdges(Utils.GetHalfCircleCells(ref tmpCells, Pawn.Position, target.Cell, Pawn.MapHeld, Props.radius, Props.angleRad));
         }
 
         /*public override void Initialize(AbilityCompProperties props)

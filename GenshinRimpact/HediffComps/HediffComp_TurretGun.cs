@@ -201,7 +201,7 @@ namespace GenshinRimpact
             {
                 yield return item;
             }
-            if (Thing is Pawn { IsColonyMechPlayerControlled: true })
+            if (Thing is Pawn)
             {
                 Command_Toggle command_Toggle = new()
                 {

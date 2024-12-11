@@ -12,10 +12,16 @@ namespace GenshinRimpact
         static GenshinRimpact_Harmony()
         {
             Harmony harmony = new("flangopink.GenshinRimpact");
-            harmony.PatchAll();
-            Utils.LogMessage("Patched " + harmony.GetPatchedMethods().Count() + " patches!");
-            //harmony.Patch(AccessTools.PropertyGetter(typeof(Pawn_AbilityTracker), "AllAbilitiesForReading"), transpiler: new HarmonyMethod(typeof(Patch_AllAbilitiesForReading), "Transpiler"));
 
+            harmony.Patch(AccessTools.Method(typeof(Pawn), "SpawnSetup"), null, new HarmonyMethod(typeof(Patches_HediffShieldManager), "OnPawnSpawn"));
+            harmony.Patch(AccessTools.Method(typeof(Pawn), "DeSpawn"), null, new HarmonyMethod(typeof(Patches_HediffShieldManager), "OnPawnDespawn"));
+            harmony.Patch(AccessTools.Method(typeof(Pawn), "DrawAt"), null, new HarmonyMethod(typeof(Patches_HediffShieldManager), "PawnPostDrawAt"));
+            harmony.Patch(AccessTools.Method(typeof(ThingWithComps), "PreApplyDamage"), null, new HarmonyMethod(typeof(Patches_HediffShieldManager), "PostPreApplyDamage"));
+            //harmony.Patch(AccessTools.Method(typeof(Verb), "CanHitTarget"), null, "CanHitTargetFrom_Postfix".MyMethod());
+
+            harmony.PatchAll();
+
+            Utils.LogMessage("Patched " + harmony.GetPatchedMethods().Count() + " patches!");
             Utils.LogMessage("♥ Thank you for using GenshinRimpact v" + Assembly.GetExecutingAssembly().GetName().Version + "! ♥");
         }
     }
