@@ -13,11 +13,16 @@ namespace GenshinRimpact
         {
             Harmony harmony = new("flangopink.GenshinRimpact");
 
+            // Shield Hediff
             harmony.Patch(AccessTools.Method(typeof(Pawn), "SpawnSetup"), null, new HarmonyMethod(typeof(Patches_HediffShieldManager), "OnPawnSpawn"));
             harmony.Patch(AccessTools.Method(typeof(Pawn), "DeSpawn"), null, new HarmonyMethod(typeof(Patches_HediffShieldManager), "OnPawnDespawn"));
             harmony.Patch(AccessTools.Method(typeof(Pawn), "DrawAt"), null, new HarmonyMethod(typeof(Patches_HediffShieldManager), "PawnPostDrawAt"));
             harmony.Patch(AccessTools.Method(typeof(ThingWithComps), "PreApplyDamage"), null, new HarmonyMethod(typeof(Patches_HediffShieldManager), "PostPreApplyDamage"));
-            //harmony.Patch(AccessTools.Method(typeof(Verb), "CanHitTarget"), null, "CanHitTargetFrom_Postfix".MyMethod());
+            
+            // Damage Infusion
+            harmony.Patch(AccessTools.Method(typeof(Bullet), "Impact"), transpiler: new HarmonyMethod(typeof(Patches_DamageInfusion), "Bullet_Impact_Transpiler"));
+            harmony.Patch(AccessTools.Method(typeof(Verb_MeleeAttackDamage), "DamageInfosToApply"), prefix: new HarmonyMethod(typeof(Patches_DamageInfusion), "Verb_MeleeAttackDamage_DamageInfosToApply_Prefix"));
+            harmony.Patch(AccessTools.Method(typeof(Verb_MeleeAttackDamage), "DamageInfosToApply"), postfix: new HarmonyMethod(typeof(Patches_DamageInfusion), "Verb_MeleeAttackDamage_DamageInfosToApply_Postfix"));
 
             harmony.PatchAll();
 

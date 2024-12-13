@@ -361,20 +361,30 @@ namespace GenshinRimpact
             return mult > 1 ? result : dest;
         }*/
 
-        public static void TryDoAbility(Pawn pawn, AbilityDef abilityDef, LocalTargetInfo targetCell)
+        public static void TryDoAbility(Pawn pawn, AbilityDef abilityDef, LocalTargetInfo target)
         {
+            if (!target.IsValid)
+            {
+                LogError("Invalid ability target: " + target.ToString());
+                return;
+            }
             Ability ab = pawn.abilities?.GetAbility(abilityDef);
             if (ab == null)
             {
-                Log.Error("subAbility is null");
+                LogError("subAbility is null");
                 return;
             }
             if (!ab.CanCast)
             {
-                Log.Error("Can't cast subAbility");
+                LogError("Can't cast subAbility");
                 return;
             }
-            Job job = ab.GetJob(targetCell, targetCell);
+            if (!ab.verb.CanHitTarget(target))
+            {
+                LogWarning("Could not hit target: " + target + " from " + pawn.Position);
+                return;
+            }
+            Job job = ab.GetJob(target, target);
             pawn.jobs.StartJob(job, JobCondition.InterruptForced);
         }
 

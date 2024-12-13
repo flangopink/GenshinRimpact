@@ -14,7 +14,6 @@ namespace GenshinRimpact
         public bool v3isv0 = false;
         public float flipChance;
 
-        public float v2_minDeviation;
-        public float v2_maxDeviation;
+        public FloatRange v2DeviationRange;
     }
 }

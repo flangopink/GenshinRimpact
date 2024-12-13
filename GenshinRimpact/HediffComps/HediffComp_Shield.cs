@@ -1,11 +1,8 @@
 ﻿using RimWorld;
 using System.Collections.Generic;
 using UnityEngine;
-using Verse.AI;
 using Verse;
 using Verse.Sound;
-using HarmonyLib;
-using System;
 
 namespace GenshinRimpact
 {
@@ -15,6 +12,9 @@ namespace GenshinRimpact
 
         public FleckDef absorbedFleck;
         public EffecterDef brokenEffecter;
+
+        public AbilityDef abilityOnBreak;
+        public bool doAbilityOnInstigator;
 
         public SoundDef soundAdded;
         public SoundDef soundBroken;
@@ -32,6 +32,8 @@ namespace GenshinRimpact
         public float energyLossPerDamage = 0.033f;
         public float energyPctOnReset = 0.2f;
         public int rechargeDelay = 180;
+
+        public List<ElementResistance> elementResistances;
 
         //public bool blockRangedVerbs;
 
@@ -75,6 +77,8 @@ namespace GenshinRimpact
         public bool useEnergy;
         protected int ticksTillReset;
         protected Vector3 impactAngleVect;
+        private float lastReceivedDamage;
+
         public virtual HediffCompProperties_Shield Props => props as HediffCompProperties_Shield;
         public virtual bool ShieldActive => energy > 0f || !useEnergy;
         public override bool CompShouldRemove => Props.disappearOnBreak && energy <= 0f;
@@ -123,7 +127,7 @@ namespace GenshinRimpact
                 absorbed = true;
                 impactAngleVect = Vector3Utility.HorizontalVectorFromAngle(dinfo.Angle);
                 Vector3 loc = Pawn.TrueCenter() + impactAngleVect.RotatedBy(180f) * 0.5f;
-                float dmgScale = Mathf.Min(10f, 2f + dinfo.Amount / 10f);
+                float dmgScale = Mathf.Min(10f, 2f + lastReceivedDamage / 10f);
                 FleckMaker.Static(loc, Pawn.Map, Props.absorbedFleck ?? FleckDefOf.ExplosionFlash, dmgScale);
                 if (Props.throwDust)
                 {
@@ -219,7 +223,18 @@ namespace GenshinRimpact
         {
             if (useEnergy)
             {
-                float num = dinfo.Amount * Props.energyLossPerDamage;
+                float receivedDamage = dinfo.Amount;
+                if (dinfo.Def.GetModExtension<ModExt_Element>() is ModExt_Element ext)
+                {
+                    foreach (var res in Props.elementResistances)
+                    {
+                        if (res.element == ext.element)
+                            receivedDamage *= res.factor;
+                    }
+                }
+                lastReceivedDamage = receivedDamage;
+
+                float num = receivedDamage * Props.energyLossPerDamage;
                 if (num < energy)
                 {
                     energy -= num;
@@ -227,9 +242,13 @@ namespace GenshinRimpact
                     return true;
                 }
                 Break();
+                if (Props.abilityOnBreak != null && !parent.pawn.DeadOrDowned)
+                {
+                    Utils.TryDoAbility(parent.pawn, Props.abilityOnBreak, Props.doAbilityOnInstigator ? dinfo.Instigator : parent.pawn.Position);
+                }
                 if (Props.allowOverkillDamage)
                 {
-                    dinfo.SetAmount(dinfo.Amount - energy / Props.energyLossPerDamage);
+                    dinfo.SetAmount(receivedDamage - energy / Props.energyLossPerDamage);
                     return false;
                 }
                 else return true;

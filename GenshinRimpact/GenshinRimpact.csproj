@@ -83,11 +83,15 @@
     <Compile Include="Abilities\CompAbilityShootMaxRange.cs" />
     <Compile Include="DevTools\DevTools.cs" />
     <Compile Include="Elements\ElementDef.cs" />
+    <Compile Include="Elements\ElementResistance.cs" />
     <Compile Include="GenshinRimpact.cs" />
     <Compile Include="HediffComps\HediffComp_AoE.cs" />
     <Compile Include="HediffComps\HediffComp_ChargingAbility.cs" />
+    <Compile Include="HediffComps\HediffComp_DamageResistance.cs" />
     <Compile Include="HediffComps\HediffComp_Draw.cs" />
+    <Compile Include="HediffComps\HediffComp_DamageInfusion.cs" />
     <Compile Include="HediffComps\HediffComp_SpawnThing.cs" />
+    <Compile Include="Patches\Patches_DamageInfusion.cs" />
     <Compile Include="Patches\Patches_HediffShieldManager.cs" />
     <Compile Include="ModExtensions\ModExt_TurnInvisible.cs" />
     <Compile Include="HediffComps\HediffComp_SeverityPerSecond.cs" />
@@ -104,7 +108,7 @@
     <Compile Include="ModExtensions\ModExt_Element.cs" />
     <Compile Include="Patches\Patch_EquipmentUtility_CanEquip.cs" />
     <Compile Include="Patches\Patch_Invisibility_UpdateTarget_Transpiler.cs" />
-    <Compile Include="Patches\Patch_Pawn_HealthTracker_PreApplyDamage_Transpiler.cs" />
+    <Compile Include="Patches\Patch_Pawn_HealthTracker_PreApplyDamage.cs" />
     <Compile Include="Patches\Patch_StaggerHandler_StaggerFor_Transpiler.cs" />
     <Compile Include="PrivateFields.cs" />
     <Compile Include="Reactions\ElementalReactionDef.cs" />

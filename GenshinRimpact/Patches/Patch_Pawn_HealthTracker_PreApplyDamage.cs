@@ -8,8 +8,25 @@ using Verse;
 namespace GenshinRimpact
 {
     //[HarmonyPatch(typeof(Pawn_HealthTracker), "PreApplyDamage")]
-    public static class Patch_Pawn_HealthTracker_PreApplyDamage_Transpiler
+    public static class Patch_Pawn_HealthTracker_PreApplyDamage
     {
+        /*[HarmonyPrefix]
+        public static bool Prefix(Pawn_HealthTracker __instance, ref DamageInfo dinfo)
+        {
+            var hediffs = __instance.hediffSet.hediffs;
+            for (int i = 0; i < hediffs.Count; i++)
+            {
+                if (hediffs[i].TryGetComp<HediffComp_DamageResistance>() is HediffComp_DamageResistance comp)
+                {
+                    if (comp.Props.damageDef != null)
+                    {
+                        dinfo.SetAmount(dinfo.Amount * comp.Props.damageMultiplier);
+                    }
+                }
+            }
+            return true;
+        }*/
+
         /*[HarmonyTranspiler]
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, bool ___absorbed)
         {

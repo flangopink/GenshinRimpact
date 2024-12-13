@@ -1,9 +1,4 @@
 ﻿using RimWorld;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using Verse;
 
@@ -46,7 +41,7 @@ namespace GenshinRimpact
             Rect rect3 = rect2;
             rect3.height = rect.height / 2f;
             Text.Font = GameFont.Tiny;
-            Widgets.Label(rect3, shield.parent.def.LabelCap + shield.Props.gizmoShowTimer
+            Widgets.Label(rect3, shield.parent.def.LabelCap
                        + (compDisappears != null ? "\n" + compDisappears.CompLabelInBracketsExtra : ""));
 
             // Shield energy
