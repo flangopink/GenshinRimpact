@@ -1,4 +1,5 @@
-﻿using Verse;
+﻿using RimWorld;
+using Verse;
 
 namespace GenshinRimpact
 {
@@ -9,11 +10,19 @@ namespace GenshinRimpact
 
     public class CompHasOwner : ThingComp
     {
-        public Thing owner;
+        public Ability ownerAbility;
+
+        public override void PostDestroy(DestroyMode mode, Map previousMap)
+        {
+            if (ownerAbility?.CompOfType<CompAbilitySpawnWithOwner>() is CompAbilitySpawnWithOwner comp)
+                comp.spawnedThings.Remove(parent);
+            else Utils.LogWarning(parent + " couldn't find CompAbilitySpawnWithOwner in " + ownerAbility);
+        }
+
         public override void PostExposeData()
         {
             base.PostExposeData();
-            Scribe_References.Look(ref owner, "owner");
+            Scribe_References.Look(ref ownerAbility, "ownerAbility");
         }
     }
 }

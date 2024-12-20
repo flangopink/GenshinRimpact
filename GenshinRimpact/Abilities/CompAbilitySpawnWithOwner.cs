@@ -1,4 +1,5 @@
 ﻿using RimWorld;
+using System.Collections.Generic;
 using Verse;
 
 namespace GenshinRimpact
@@ -7,6 +8,7 @@ namespace GenshinRimpact
     {
         public ThingDef thingDef;
         public bool allowOnBuildings = true;
+        public int spawnLimit = 1;
         public CompProperties_AbilitySpawnWithOwner() => compClass = typeof(CompAbilitySpawnWithOwner);
     }
 
@@ -14,14 +16,25 @@ namespace GenshinRimpact
     public class CompAbilitySpawnWithOwner : CompAbilityEffect // Use this for Keqing teleports or something similar
     {
         public new CompProperties_AbilitySpawnWithOwner Props => (CompProperties_AbilitySpawnWithOwner)props;
+        public HashSet<Thing> spawnedThings = [];
 
         public override void Apply(LocalTargetInfo target, LocalTargetInfo dest)
         {
             base.Apply(target, dest);
-            Thing t = GenSpawn.Spawn(Props.thingDef, target.Cell, parent.pawn.Map);
+            if (Props.spawnLimit > 0 && spawnedThings.Count >= Props.spawnLimit) 
+            {
+                if (spawnedThings.TryMinBy(x => x.TickSpawned, out Thing replacedThing))
+                {
+                    spawnedThings.Remove(replacedThing);
+                    replacedThing.Destroy();
+                }
+            }
+            Thing t = ThingMaker.MakeThing(Props.thingDef);
             var comp = t.TryGetComp<CompHasOwner>();
-            if (comp != null) comp.owner = parent.pawn;
+            if (comp != null) comp.ownerAbility = parent;
             else Log.Error(t.ToString() + " does not have CompHasOwner");
+            GenSpawn.Spawn(Props.thingDef, target.Cell, parent.pawn.Map);
+            spawnedThings.Add(t);
         }
 
         public override bool Valid(LocalTargetInfo target, bool throwMessages = false)
@@ -35,6 +48,12 @@ namespace GenshinRimpact
                 return false;
             }
             return true;
+        }
+
+        public override void PostExposeData()
+        {
+            base.PostExposeData();
+            Scribe_Collections.Look(ref spawnedThings, "spawnedThings");
         }
     }
 }

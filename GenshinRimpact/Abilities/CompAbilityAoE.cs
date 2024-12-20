@@ -2,31 +2,49 @@
 using RimWorld;
 using System.Collections.Generic;
 using UnityEngine;
-using Verse.Noise;
 
 namespace GenshinRimpact
 {
     public class CompProperties_AbilityAoE : CompProperties_AbilityEffect//EffectWithDest
     {
+        public AoEParameters aoeProperties;
+
         public EffecterDef effecterPreCast;
+        public int effecterPreCastTicks;
+
+        /*
         public EffecterDef effecterOnTrigger;
         public DamageDef damageDef;
         public HediffDef hediffDef;
         public float hediffSeverity = 1f;
         public float damageAmount = 10f;
-        public float radius = 3.9f;
-        //public int applyDelayTicks;
         public int effecterPreCastTicks;
+        //public int applyDelayTicks;
 
-        public bool isExplosive;
-        public bool isDirect;
+        public bool isDirect = true;
         public bool canFriendlyFire;
         public bool onlyAffectFriendlies;
 
-        public AoEShape shape = AoEShape.Radial;
-        public float angleRad = Mathf.PI;
+        public bool isExplosive;
+        public float explosionRadius = 3.9f;
+
+        public AoEShapeParameters shapeParams;
+        public AoEKnockbackParameters knockbackParams;
+
+        public bool isPlunging;
+        */
 
         public CompProperties_AbilityAoE() => compClass = typeof(CompAbilityAoE);
+
+        public override IEnumerable<string> ConfigErrors(AbilityDef parentDef)
+        {
+            foreach (var error in base.ConfigErrors(parentDef))
+                yield return error;
+            if (aoeProperties == null)
+                yield return $"{parentDef} has CompProperties_AbilityAoE but no <aoeProperties> set";
+            else if (aoeProperties.shapeParams == null)
+                yield return $"{parentDef} has CompProperties_AbilityAoE but no <shapeParams> set in <aoeProperties>";
+        }
     }
 
     [HotSwap.HotSwappable]
@@ -37,13 +55,13 @@ namespace GenshinRimpact
         public List<IntVec3> tmpCells = [];
 
         private Pawn Pawn => parent.pawn;
+        private AoEParameters Params => Props.aoeProperties;
 
         //private int ticksLeftToApply;
-
         public override void Apply(LocalTargetInfo target, LocalTargetInfo dest)
         {
             base.Apply(target, dest);
-            Utils.DoAoEAbility(target, Pawn, parent.def, Props.damageAmount, Props.radius, Props.damageDef, Props.hediffDef, Props.hediffSeverity, Props.effecterOnTrigger, Props.isExplosive, Props.isDirect, Props.canFriendlyFire, Props.onlyAffectFriendlies, Props.screenShakeIntensity, Props.sound, Props.shape, Props.angleRad);
+            Utils.DoAoEAbility(target, Pawn, parent.def, Params.shapeParams, Params.damageAmount, Params.damageDef, Params.hediffDef, Params.hediffSeverity, Params.effecterOnTrigger, Params.isDirect, Params.canFriendlyFire, Params.onlyAffectFriendlies, Params.isExplosive, Params.explosionRadius, Props.screenShakeIntensity, Props.sound, Params.knockbackParams);
         }
 
         public override IEnumerable<PreCastAction> GetPreCastActions()
@@ -63,7 +81,26 @@ namespace GenshinRimpact
 
         public override void DrawEffectPreview(LocalTargetInfo target)
         {
-            if (Props.shape != AoEShape.Radial) GenDraw.DrawFieldEdges(Utils.GetHalfCircleCells(ref tmpCells, Pawn.Position, target.Cell, Pawn.MapHeld, Props.radius, Props.angleRad));
+            switch (Params.shapeParams.shape) 
+            {
+                case AoEShape.HalfRadial:
+                    GenDraw.DrawFieldEdges(Utils.GetHalfCircleCells(ref tmpCells, Pawn.Position, target.Cell, Pawn.MapHeld, Params.shapeParams.radius, Params.shapeParams.angleRad, false));
+                    break;
+                case AoEShape.HalfRadialFilled: 
+                    GenDraw.DrawFieldEdges(Utils.GetHalfCircleCells(ref tmpCells, Pawn.Position, target.Cell, Pawn.MapHeld, Params.shapeParams.radius, Params.shapeParams.angleRad, true));
+                    break;
+                case AoEShape.Cone: 
+                    GenDraw.DrawFieldEdges(Utils.ConeAffectedCells(ref tmpCells, Pawn.Position, target.Cell, Pawn.MapHeld, Params.shapeParams.radius, Params.shapeParams.coneAngleDeg, Params.shapeParams.coneWidth));
+                    break;
+                case AoEShape.Rectangular:
+                    Utils.LogErrorOnce("CompAbilityAoE: fix rectangle aoe please.", 69697760);
+                    break;
+                default:
+                    Utils.LogErrorOnce("CompAbilityAoE does not have an AoEShape.", 69697770);
+                    break;
+            }
+            if (Params.knockbackParams != null && Params.knockbackParams.showLandingCells)
+                GenDraw.DrawFieldEdges(Utils.GetKnockbackCells(Pawn.Position, target.Cell, Pawn.MapHeld, Params.knockbackParams), Color.cyan);
         }
 
         /*public override void Initialize(AbilityCompProperties props)

@@ -7,6 +7,9 @@ namespace GenshinRimpact
     public class CompProperties_AbilityTeleport : CompProperties_AbilityEffect
     {
         public ThingDef teleportThingDef;
+        public EffecterDef entryEffecter;
+        public EffecterDef exitEffecter;
+        public bool doEffecter = true;
         public CompProperties_AbilityTeleport() => compClass = typeof(CompAbilityTeleport);
     }
 
@@ -23,9 +26,12 @@ namespace GenshinRimpact
             base.Apply(target, dest);
             if (Props.teleportThingDef != null)
             {
-                var teleportThing = Pawn.MapHeld.spawnedThings.FirstOrDefault((Thing x) => x.def == Props.teleportThingDef && x.TryGetComp<CompHasOwner>()?.owner == Pawn); // poorly optimized but ok
+                var teleportThing = Pawn.MapHeld.spawnedThings.FirstOrDefault((Thing x) => x.def == Props.teleportThingDef && x.TryGetComp<CompHasOwner>()?.ownerAbility.pawn == Pawn); // poorly optimized but ok
                 if (teleportThing != null)
-                    SkipUtility.SkipTo(Pawn, teleportThing.Position, teleportThing.MapHeld);
+                {
+                    Utils.SkipTo(Pawn, teleportThing.Position, teleportThing.MapHeld, Props.entryEffecter, Props.exitEffecter, Props.doEffecter);
+                    teleportThing.Destroy();
+                }
                 else Messages.Message("CannotUseAbility".Translate(parent.def.label) + ": " + "GR_TeleportDestinationDoesNotExist".Translate(), MessageTypeDefOf.RejectInput, false);
             }
             else SkipUtility.SkipTo(Pawn, target.Cell, Pawn.MapHeld);

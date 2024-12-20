@@ -1,11 +1,14 @@
 ﻿using RimWorld;
+using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using Verse;
 using Verse.AI;
+using Verse.AI.Group;
+using static HarmonyLib.Code;
+using static UnityEngine.GraphicsBuffer;
 
 namespace GenshinRimpact
 {
@@ -22,7 +25,7 @@ namespace GenshinRimpact
         public static readonly Dictionary<ReactionData, Type> AllReactionsForReading = [];
         public static readonly Dictionary<ThingDef, VisionDef> AllVisionsForReading = [];
 
-        public static List<IntVec3> tmpCells = [];
+        public static List<IntVec3> tmpConeCells = [];
 
         /*public static Color GetElementColor(Element element)
         {
@@ -80,6 +83,7 @@ namespace GenshinRimpact
         public static void LogMessage(string str) => Log.Message("<color=#f4abba>[GenshinRimpact]</color> " + str);
         public static void LogWarning(string str) => Log.Warning("<color=#f4abba>[GenshinRimpact]</color> " + str);
         public static void LogError(string str) => Log.Error("<color=#f4abba>[GenshinRimpact]</color> " + str);
+        public static void LogErrorOnce(string str, int key) => Log.ErrorOnce("<color=#f4abba>[GenshinRimpact]</color> " + str, key);
 
         public static ElementalReactionDef GetReaction(ElementDef appliedElement, ElementDef otherElement, Status status)
         {
@@ -169,38 +173,38 @@ namespace GenshinRimpact
             };
         }
 
-        public static List<IntVec3> ConeAffectedCells(ref List<IntVec3> tmpCells, Ability ability, Pawn caster, LocalTargetInfo target, float range = 7.9f, float angle = 60f, float lineWidthEnd = 3f, bool canHitFilledCells = false)
+        public static List<IntVec3> ConeAffectedCells(ref List<IntVec3> tmpCells, IntVec3 casterPos, LocalTargetInfo target, Map map, float range = 7.9f, float angle = 60f, float lineWidthEnd = 3f, bool canHitFilledCells = false)
         {
             tmpCells.Clear();
-            IntVec3 intVec = target.Cell.ClampInsideMap(caster.Map);
-            if (caster.Position == intVec)
+            IntVec3 intVec = target.Cell.ClampInsideMap(map);
+            if (casterPos == intVec)
             {
                 return tmpCells;
             }
-            Vector3 vector = caster.Position.ToVector3Shifted().Yto0();
-            float lengthHorizontal = (intVec - caster.Position).LengthHorizontal;
-            float num = (intVec.x - caster.Position.x) / lengthHorizontal;
-            float num2 = (intVec.z - caster.Position.z) / lengthHorizontal;
-            intVec.x = Mathf.RoundToInt(caster.Position.x + num * range);
-            intVec.z = Mathf.RoundToInt(caster.Position.z + num2 * range);
+            Vector3 vector = casterPos.ToVector3Shifted().Yto0();
+            float lengthHorizontal = (intVec - casterPos).LengthHorizontal;
+            float num = (intVec.x - casterPos.x) / lengthHorizontal;
+            float num2 = (intVec.z - casterPos.z) / lengthHorizontal;
+            intVec.x = Mathf.RoundToInt(casterPos.x + num * range);
+            intVec.z = Mathf.RoundToInt(casterPos.z + num2 * range);
             float target2 = Vector3.SignedAngle(intVec.ToVector3Shifted().Yto0() - vector, Vector3.right, Vector3.up);
             float num3 = lineWidthEnd / 2f;
-            float num4 = Mathf.Sqrt(Mathf.Pow((intVec - caster.Position).LengthHorizontal, 2f) + Mathf.Pow(num3, 2f));
+            float num4 = Mathf.Sqrt(Mathf.Pow((intVec - casterPos).LengthHorizontal, 2f) + Mathf.Pow(num3, 2f));
             float num5 = angle * Mathf.Asin(num3 / num4); //57.29578f
             int num6 = GenRadial.NumCellsInRadius(range);
             for (int i = 0; i < num6; i++)
             {
-                IntVec3 intVec2 = caster.Position + GenRadial.RadialPattern[i];
-                if (CanUseCell(intVec2, caster.Position, caster.MapHeld, range, ability?.verb, canHitFilledCells) && Mathf.Abs(Mathf.DeltaAngle(Vector3.SignedAngle(intVec2.ToVector3Shifted().Yto0() - vector, Vector3.right, Vector3.up), target2)) <= num5)
+                IntVec3 intVec2 = casterPos + GenRadial.RadialPattern[i];
+                if (CanUseCell(intVec2, casterPos, map, range, canHitFilledCells) && Mathf.Abs(Mathf.DeltaAngle(Vector3.SignedAngle(intVec2.ToVector3Shifted().Yto0() - vector, Vector3.right, Vector3.up), target2)) <= num5)
                 {
                     tmpCells.Add(intVec2);
                 }
             }
-            List<IntVec3> list = GenSight.BresenhamCellsBetween(caster.Position, intVec);
+            List<IntVec3> list = GenSight.BresenhamCellsBetween(casterPos, intVec);
             for (int j = 0; j < list.Count; j++)
             {
                 IntVec3 intVec3 = list[j];
-                if (!tmpCells.Contains(intVec3) && CanUseCell(intVec3, caster.Position, caster.MapHeld, range, ability?.verb, canHitFilledCells))
+                if (!tmpCells.Contains(intVec3) && CanUseCell(intVec3, casterPos, map, range, canHitFilledCells))
                 {
                     tmpCells.Add(intVec3);
                 }
@@ -208,7 +212,7 @@ namespace GenshinRimpact
             return tmpCells;
         }
 
-        public static bool CanUseCell(IntVec3 c, IntVec3 pos, Map map, float range, Verb verb, bool canHitFilledCells = false)
+        public static bool CanUseCell(IntVec3 c, IntVec3 pos, Map map, float range, bool canHitFilledCells = false)
         {
             if (!c.InBounds(map))
                 return false;
@@ -222,10 +226,10 @@ namespace GenshinRimpact
             if (!c.InHorDistOf(pos, range))
                 return false;
 
-            return verb?.TryFindShootLineFromTo(pos, c, out ShootLine _) ?? false;
+            return GenSight.LineOfSight(pos, c, map); //verb?.TryFindShootLineFromTo(pos, c, out ShootLine _) ?? false;
         }
 
-        public static List<IntVec3> AffectedLineCells(ref List<IntVec3> tmpCells, IntVec3 casterPos, IntVec3 targetPos, Map map, float range, Verb verb, bool canHitFilledCells = false)
+        public static List<IntVec3> AffectedLineCells(ref List<IntVec3> tmpCells, IntVec3 casterPos, IntVec3 targetPos, Map map, float range, bool canHitFilledCells = false)
         {
             tmpCells.Clear();
             //Utils.LogMessage(targetPos.ToString());
@@ -238,7 +242,7 @@ namespace GenshinRimpact
             for (int j = 0; j < list.Count; j++)
             {
                 IntVec3 intVec3 = list[j];
-                if (!tmpCells.Contains(intVec3) && CanUseCell(intVec3, casterPos, map, range, verb, canHitFilledCells))
+                if (!tmpCells.Contains(intVec3) && CanUseCell(intVec3, casterPos, map, range, canHitFilledCells))
                 {
                     tmpCells.Add(intVec3);
                 }
@@ -296,8 +300,7 @@ namespace GenshinRimpact
                 return targetPos;
             }
             direction.Normalize();
-            float maxRange = range;
-            IntVec3 newTargetPos = casterPos + (direction * maxRange).ToIntVec3();
+            IntVec3 newTargetPos = casterPos + (direction * range).ToIntVec3();
             if (newTargetPos.InBounds(map))
             {
                 return newTargetPos;
@@ -305,7 +308,7 @@ namespace GenshinRimpact
             else
             {
                 // If the furthest cell isn't valid, find the furthest valid cell in the direction.
-                for (float i = maxRange; i > 0; i--)
+                for (float i = range; i > 0; i--)
                 {
                     IntVec3 potentialTargetPos = casterPos + (direction * i).ToIntVec3();
                     if (potentialTargetPos.InBounds(map))
@@ -388,8 +391,14 @@ namespace GenshinRimpact
             pawn.jobs.StartJob(job, JobCondition.InterruptForced);
         }
 
-        public static void DoAoEAbility(LocalTargetInfo targetCell, Pawn caster, AbilityDef abilityDef, float damageAmount = 10f, float radius = 3.9f, DamageDef damageDef = null, HediffDef hediffDef = null, float hediffSeverity = 1f, EffecterDef effecterOnTrigger = null, bool isExplosive = false, bool isDirect = false, bool canFriendlyFire = false, bool onlyAffectFriendlies = false, float explosionScreenShake = 0f, SoundDef explosionSound = null, AoEShape shape = AoEShape.Radial, float angleRad = Mathf.PI)
+        public static void DoAoEAbility(LocalTargetInfo targetCell, Pawn caster, AbilityDef abilityDef, AoEShapeParameters shapeParams, float damageAmount = 10f, DamageDef damageDef = null, HediffDef hediffDef = null, float hediffSeverity = 1f, EffecterDef effecterOnTrigger = null, bool isDirect = false, bool canFriendlyFire = false, bool onlyAffectFriendlies = false, bool isExplosive = false, float explosionRadius = 3.9f, float explosionScreenShake = 0f, SoundDef explosionSound = null, AoEKnockbackParameters knockbackParams = null)
         {
+            if (shapeParams == null)
+            {
+                LogError("Tried casting " + abilityDef + ", but it does not have <shapeParams>");
+                return;
+            }
+
             IntVec3 cell = targetCell.Cell;
             Map map = caster.Map;
             List<Thing> affectedThings = [];
@@ -398,16 +407,25 @@ namespace GenshinRimpact
             effecterOnTrigger?.Spawn(cell, map).Cleanup();
 
             List<IntVec3> cells = [];
-            switch (shape)
+            switch (shapeParams.shape)
             {
                 case AoEShape.Radial:
-                    cells = GenRadial.RadialCellsAround(cell, radius, true).ToList();
+                    cells = GenRadial.RadialCellsAround(cell, shapeParams.radius, true).ToList();
                     break;
                 case AoEShape.HalfRadial:
-                    GetHalfCircleCells(ref cells, caster.Position, cell, map, radius, angleRad, false); // PI/2 by default
+                    GetHalfCircleCells(ref cells, caster.Position, cell, map, shapeParams.radius, shapeParams.angleRad, false); // PI/2 by default
                     break;
                 case AoEShape.HalfRadialFilled:
-                    GetHalfCircleCells(ref cells, caster.Position, cell, map, radius, angleRad, true); // PI/2 by default
+                    GetHalfCircleCells(ref cells, caster.Position, cell, map, shapeParams.radius, shapeParams.angleRad, true); // PI/2 by default
+                    break;
+                case AoEShape.Cone:
+                    ConeAffectedCells(ref cells, caster.Position, cell, map, shapeParams.radius, shapeParams.coneAngleDeg, shapeParams.coneWidth);
+                    break;
+                case AoEShape.Rectangular:
+                    LogErrorOnce("DoAoEAbility: fix rectangle aoe please.", 69697761);
+                    break;
+                default:
+                    LogErrorOnce("DoAoEAbility does not have an AoEShape.", 69697771);
                     break;
             }
             //int cellNum = GenRadial.NumCellsInRadius(radius);
@@ -453,11 +471,11 @@ namespace GenshinRimpact
                 {
                     Thing thing = affectedThings[i];
 
-                    ModExt_Element ext = null;
+                    ModExt_Element elementExt = null;
+
                     if (damageDef != null)
                     {
-                        ext = damageDef?.GetModExtension<ModExt_Element>();
-
+                        elementExt = damageDef?.GetModExtension<ModExt_Element>();
                         var dresult = thing.TakeDamage(new(damageDef, damageAmount, instigator: caster, intendedTarget: thing));
                         if (thing is Pawn pawn)
                         {
@@ -468,8 +486,7 @@ namespace GenshinRimpact
                     }
                     if (hediffDef != null)
                     {
-                        ext = hediffDef?.GetModExtension<ModExt_Element>();
-
+                        elementExt = hediffDef?.GetModExtension<ModExt_Element>();
                         if (thing is Pawn pawn)
                         {
                             Hediff h = HediffMaker.MakeHediff(hediffDef, pawn);
@@ -479,12 +496,153 @@ namespace GenshinRimpact
                             //Find.BattleLog.Add(battleLog);
                         }
                     }
-                    if (ext != null && thing.TryGetComp<CompElementalHandler>() is CompElementalHandler comp) comp.ApplyElement(ext.element, caster);
+                    if (knockbackParams != null)
+                    {
+                        if (thing is Pawn pawn)
+                        {
+                            var knockbackCells = GetKnockbackCells(caster.Position, pawn.Position, map, knockbackParams);
+                            if (knockbackCells.Any())
+                            {
+                                IntVec3 targetPos = knockbackCells.RandomElement();
+                                if (knockbackParams.flyerDef != null)
+                                {
+                                    bool isSelected = Find.Selector.IsSelected(pawn);
+                                    PawnFlyer pawnFlyer = PawnFlyer.MakeFlyer(knockbackParams.flyerDef, pawn, targetPos, knockbackParams.flyerEffecter, null);
+                                    if (pawnFlyer != null)
+                                    {
+                                        FleckMaker.ThrowDustPuff(targetPos.ToVector3Shifted() + Gen.RandomHorizontalVector(0.5f), map, 2f);
+                                        GenSpawn.Spawn(pawnFlyer, targetPos, map);
+                                        if (isSelected)
+                                        {
+                                            Find.Selector.Select(pawn, false, false);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    pawn.Position = targetPos;
+                                    pawn.pather.StopDead();
+                                    pawn.jobs.StopAll();
+                                }
+                            }
+                        }
+                    }
+                    if (elementExt != null && thing.TryGetComp<CompElementalHandler>() is CompElementalHandler comp) 
+                    { 
+                        comp.ApplyElement(elementExt.element, caster); 
+                    }
                 }
             }
             if (isExplosive)
             {
-                GenExplosion.DoExplosion(cell, caster.MapHeld, radius, damageDef, caster, (int)damageAmount, ignoredThings: ignoredThings, screenShakeFactor: explosionScreenShake, explosionSound: explosionSound);
+                GenExplosion.DoExplosion(cell, caster.MapHeld, explosionRadius, damageDef, caster, (int)damageAmount, ignoredThings: ignoredThings, screenShakeFactor: explosionScreenShake, explosionSound: explosionSound);
+            }
+        }
+
+        public static List<IntVec3> GetKnockbackCells(IntVec3 casterCell, IntVec3 thingCell, Map map, AoEKnockbackParameters knockbackParams)
+        {
+            List<IntVec3> tmpKnockbackCells = [];
+            if (casterCell == thingCell) return tmpKnockbackCells;
+
+            IntVec3 centerCell = IntVec3.Invalid;
+
+            var direction = (knockbackParams.isPull ? (casterCell - thingCell) : (thingCell - casterCell)).ToVector3().normalized;
+            IntVec3 newTargetPos = thingCell + (direction * knockbackParams.distance).ToIntVec3();
+
+            if (newTargetPos.InBounds(map) && newTargetPos.Walkable(map) && GenSight.LineOfSight(thingCell, newTargetPos, map))
+            {
+                centerCell = newTargetPos;
+            }
+            else
+            {
+                // LOS-check
+                for (float i = knockbackParams.distance; i > 0; i--)
+                {
+                    IntVec3 potentialTargetPos = thingCell + (direction * i).ToIntVec3();
+                    if (potentialTargetPos.InBounds(map) && potentialTargetPos.Walkable(map) && GenSight.LineOfSight(thingCell, potentialTargetPos, map))
+                    {
+                        centerCell = potentialTargetPos;
+                        break;
+                    }
+                }
+
+            }
+            if (centerCell.IsValid)
+            {
+                var cells = GenRadial.RadialCellsAround(newTargetPos, knockbackParams.landingRadius, true);
+                foreach (var c in cells)
+                {
+                    if (c.InBounds(map) && c.Walkable(map) && GenSight.LineOfSight(thingCell, c, map))
+                        tmpKnockbackCells.Add(c);
+                }
+            }
+            else
+            {
+                centerCell = thingCell;
+                tmpKnockbackCells.Add(centerCell);
+            }
+            return tmpKnockbackCells;
+        }
+
+        public static Thing SkipTo(Thing thing, IntVec3 cell, Map dest, EffecterDef entryEffecter, EffecterDef exitEffecter, bool doEffecter = true)
+        {
+            if (thing.Spawned)
+            {
+                SkipDeSpawn(thing, doEffecter ? entryEffecter ?? EffecterDefOf.Skip_EntryNoDelay : null);
+            }
+            Thing thing2 = SkipSpawn(thing, cell, dest, doEffecter ? exitEffecter ?? EffecterDefOf.Skip_ExitNoDelay : null);
+            if (thing2 is Pawn pawn)
+            {
+                pawn.Notify_Teleported();
+                Find.Selector.Select(pawn, false);
+            }
+            return thing2;
+
+            static void SkipDeSpawn(Thing thing, EffecterDef entryEffecter)
+            {
+                if (!thing.Spawned)
+                {
+                    Log.ErrorOnce("Cannot skip despawn spawn a thing which is already despawned.", 89689431);
+                    return;
+                }
+                if (thing is Pawn pawn)
+                {
+                    if (pawn.carryTracker.CarriedThing != null && !pawn.Drafted)
+                    {
+                        pawn.carryTracker.TryDropCarriedThing(thing.Position, ThingPlaceMode.Direct, out var _);
+                    }
+
+                    if (pawn.drafter != null)
+                    {
+                        pawn.wasDraftedBeforeSkip = pawn.drafter.Drafted;
+                    }
+                }
+                entryEffecter.Spawn(thing, thing.MapHeld).Cleanup();
+                thing.DeSpawnOrDeselect();
+            }
+
+            static Thing SkipSpawn(Thing thing, IntVec3 cell, Map dest, EffecterDef exitEffecter)
+            {
+                if (thing.Spawned)
+                {
+                    Log.ErrorOnce("Cannot skip spawn a thing which is already spawned, use SkipTo or call SkipDeSpawn first.", 47256283);
+                    return null;
+                }
+                Thing thing2 = GenSpawn.Spawn(thing, cell, dest, thing.def.defaultPlacingRot);
+                exitEffecter.Spawn(thing2, dest).Cleanup();
+                if (thing is Pawn pawn)
+                {
+                    if (pawn.TryGetFormingCaravanLord(out var lord) && lord.Map != pawn.Map)
+                    {
+                        CaravanFormingUtility.RemovePawnFromCaravan(pawn, pawn.GetLord(), removeFromDowned: false);
+                    }
+
+                    if (pawn.drafter != null && pawn.wasDraftedBeforeSkip)
+                    {
+                        pawn.drafter.Drafted = true;
+                    }
+                }
+                return thing2;
             }
         }
     }
@@ -502,6 +660,7 @@ namespace GenshinRimpact
         Radial = 0,
         HalfRadial = 1,
         HalfRadialFilled = 2,
-        Rectangular = 3 // Unused for now
+        Rectangular = 3,
+        Cone = 4 // Unused for now
     }
 }

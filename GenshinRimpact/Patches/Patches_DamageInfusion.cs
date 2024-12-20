@@ -32,7 +32,7 @@ namespace GenshinRimpact
                     yield return new CodeInstruction(OpCodes.Ldarg_0);
                     yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(Projectile), "launcher"));
                     yield return new CodeInstruction(OpCodes.Ldloca_S, damageDef.LocalIndex);
-                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Patches_DamageInfusion), "TryReplaceDamageInfusion")); // this returns bool
+                    yield return new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(Patches_DamageInfusion), "TryReplaceDamageInfusion"));
 
                     continue;
                 }

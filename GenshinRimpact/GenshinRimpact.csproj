@@ -75,7 +75,7 @@
     <Compile Include="Abilities\CompAbilitySpawnWithEffecter.cs" />
     <Compile Include="Abilities\CompAbilityStackOffset.cs" />
     <Compile Include="Abilities\CompAbilityCooldownTimer.cs" />
-    <Compile Include="Abilities\CompAbilityDash.cs" />
+    <Compile Include="Abilities\CompAbilityFlyer.cs" />
     <Compile Include="Abilities\CompAbilityKnockback.cs" />
     <Compile Include="Abilities\CompAbilitySpawnWithOwner.cs" />
     <Compile Include="Abilities\CompAbilityTeleport.cs" />
@@ -91,6 +91,9 @@
     <Compile Include="HediffComps\HediffComp_Draw.cs" />
     <Compile Include="HediffComps\HediffComp_DamageInfusion.cs" />
     <Compile Include="HediffComps\HediffComp_SpawnThing.cs" />
+    <Compile Include="Misc\AoEKnockbackParameters.cs" />
+    <Compile Include="Misc\AoEParameters.cs" />
+    <Compile Include="Misc\AoEShapeParameters.cs" />
     <Compile Include="Patches\Patches_DamageInfusion.cs" />
     <Compile Include="Patches\Patches_HediffShieldManager.cs" />
     <Compile Include="ModExtensions\ModExt_TurnInvisible.cs" />
@@ -101,7 +104,7 @@
     <Compile Include="HediffComps\HediffComp_TurretGun.cs" />
     <Compile Include="Misc\BattleLogEntry_DamageTakenAbility.cs" />
     <Compile Include="Misc\BulletBezier.cs" />
-    <Compile Include="Misc\DashingPawn.cs" />
+    <Compile Include="Misc\PawnFlyerExtended.cs" />
     <Compile Include="Misc\GR_Cache.cs" />
     <Compile Include="Misc\PawnRenderSubWorker_InvisibilityCheck.cs" />
     <Compile Include="ModExtensions\ModExt_Bezier.cs" />

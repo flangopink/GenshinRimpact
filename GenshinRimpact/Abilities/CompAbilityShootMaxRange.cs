@@ -70,7 +70,7 @@ namespace GenshinRimpact
             {
                 GenDraw.DrawTargetHighlight(target);
                 //DrawHighlightFieldRadiusAroundTarget(target);
-                GenDraw.DrawFieldEdges(Utils.AffectedLineCells(ref tmpCells, Caster.Position, Utils.RedirectIntVec3ToMaxRange(Caster.Position, target.Cell, Caster.Map, Range), Caster.MapHeld, Range, parent.verb, true)); ;
+                GenDraw.DrawFieldEdges(Utils.AffectedLineCells(ref tmpCells, Caster.Position, Utils.RedirectIntVec3ToMaxRange(Caster.Position, target.Cell, Caster.Map, Range), Caster.MapHeld, Range, true)); ;
             }
         }
     }

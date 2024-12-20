@@ -1,34 +1,31 @@
 ﻿using RimWorld;
+using System.Collections.Generic;
 using Verse;
 
 namespace GenshinRimpact
 {
     public class HediffCompProperties_AoE : HediffCompProperties
     {
-        public AbilityDef abilityDef;
-        public DamageDef damageDef;
-        public HediffDef hediffDef;
+        public AoEParameters aoeProperties;
 
+        public AbilityDef abilityDef;
+        public int intervalTicks = 60;
         public EffecterDef effecterAttached;
         public EffecterDef effecterEnd;
-        public EffecterDef effecterOnTrigger;
-
-        public int intervalTicks = 60;
-        public float hediffSeverity = 1f;
-        public float damageAmount = 10f;
-        public float radius = 3.9f;
-
-        public bool isExplosive;
-        public bool isDirect;
-        public bool canFriendlyFire;
-        public bool onlyAffectFriendlies;
-
-        public bool isPlunging;
 
         public float screenShakeIntensity = 1f;
         public SoundDef sound;
 
         public HediffCompProperties_AoE() => compClass = typeof(HediffComp_AoE);
+        public override IEnumerable<string> ConfigErrors(HediffDef parentDef)
+        {
+            foreach (var error in base.ConfigErrors(parentDef))
+                yield return error;
+            if (aoeProperties == null)
+                yield return $"{parentDef} has CompProperties_AbilityAoE but no <aoeProperties> set";
+            else if (aoeProperties.shapeParams == null)
+                yield return $"{parentDef} has CompProperties_AbilityAoE but no <shapeParams> set in <aoeProperties>";
+        }
     }
 
     public class HediffComp_AoE : HediffComp
@@ -52,7 +49,8 @@ namespace GenshinRimpact
             tickCounter++;
             effecter?.EffectTick(Pawn, Pawn);
             if (tickCounter < Props.intervalTicks) return;
-            Utils.DoAoEAbility(Pawn.Position, Pawn, Props.abilityDef, Props.damageAmount, Props.radius, Props.damageDef, Props.hediffDef, Props.hediffSeverity, Props.effecterOnTrigger, Props.isExplosive, Props.isDirect, Props.canFriendlyFire, Props.onlyAffectFriendlies, Props.screenShakeIntensity, Props.sound);
+            var parms = Props.aoeProperties;
+            Utils.DoAoEAbility(Pawn.Position, Pawn, Props.abilityDef, parms.shapeParams, parms.damageAmount, parms.damageDef, parms.hediffDef, parms.hediffSeverity, parms.effecterOnTrigger, parms.isDirect, parms.canFriendlyFire, parms.onlyAffectFriendlies, parms.isExplosive, parms.explosionRadius, Props.screenShakeIntensity, Props.sound, parms.knockbackParams);
         }
 
         public override void CompExposeData()
