@@ -8,32 +8,9 @@ namespace GenshinRimpact
     {
         public static Dictionary<Pawn, List<HediffComp_Draw>> HediffDrawsByPawn = [];
 
-        private static List<HediffComp_Draw> GetDrawComps(Pawn p)
-        {
-            List<HediffComp_Draw> list = [];
-            var hediffs = p.health.hediffSet.hediffs;
-            for (int i = 0; i < hediffs.Count; i++)
-            {
-                if (hediffs[i].TryGetComp<HediffComp_Draw>() is HediffComp_Draw drawComp)
-                    list.Add(drawComp);
-            }
-            return list;
-        }
-        private static List<HediffComp_Shield> GetShieldComps(Pawn p)
-        {
-            List<HediffComp_Shield> list = [];
-            var hediffs = p.health.hediffSet.hediffs;
-            for (int i = 0; i < hediffs.Count; i++)
-            {
-                if (hediffs[i].TryGetComp<HediffComp_Shield>() is HediffComp_Shield drawComp)
-                    list.Add(drawComp);
-            }
-            return list;
-        }
-
         public static void OnPawnSpawn(Pawn __instance)
         {
-            HediffDrawsByPawn.Add(__instance, GetDrawComps(__instance));
+            HediffDrawsByPawn.Add(__instance, Utils.GetHediffCompsOfType<HediffComp_Draw>(__instance));
         }
 
         public static void OnPawnDespawn(Pawn __instance)
@@ -58,7 +35,15 @@ namespace GenshinRimpact
             {
                 return;
             }
-            foreach (HediffComp_Shield item in GetShieldComps(pawn))
+            foreach (HediffComp_DamageMultiplier item in Utils.GetHediffCompsOfType<HediffComp_DamageMultiplier>(pawn))
+            {
+                foreach (var mult in item.Props.damageMultipliers)
+                {
+                    if (mult.damageDef == dinfo.Def)
+                        dinfo.SetAmount(dinfo.Amount * mult.multiplier);
+                }
+            }
+            foreach (HediffComp_Shield item in Utils.GetHediffCompsOfType<HediffComp_Shield>(pawn))
             {
                 item.PreApplyDamage(ref dinfo, ref absorbed);
                 if (absorbed)

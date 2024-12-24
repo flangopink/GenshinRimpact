@@ -1,8 +1,8 @@
 ﻿using HarmonyLib;
 using RimWorld;
-using System;
-using System.Collections.Generic;
+using System.Security.Cryptography;
 using Verse;
+using static RimWorld.PsychicRitualRoleDef;
 
 namespace GenshinRimpact
 {
@@ -18,7 +18,16 @@ namespace GenshinRimpact
         {
             if (__result)
             {
-                if (!thing.HasComp<CompVisionEquippableAbilities>()) return;
+                var comp = thing.TryGetComp<CompVisionEquippableAbilities>();
+                if (comp == null) return;
+
+                if (comp.Props.visionDef.mustBeCapableOfViolence && pawn.WorkTagIsDisabled(WorkTags.Violent))
+                {
+                    __result = false;
+                    cantReason = "IsIncapableOfViolence".Translate(pawn.LabelShort, pawn);
+                    return;
+                }
+
                 var allEq = pawn.equipment.AllEquipmentListForReading;
                 for (int i = 0; i < allEq.Count; i++)
                 {

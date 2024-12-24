@@ -645,6 +645,18 @@ namespace GenshinRimpact
                 return thing2;
             }
         }
+
+        public static List<T> GetHediffCompsOfType<T>(Pawn p) where T : HediffComp
+        {
+            List<T> list = [];
+            var hediffs = p.health.hediffSet.hediffs;
+            for (int i = 0; i < hediffs.Count; i++)
+            {
+                if (hediffs[i].TryGetComp<T>() is T comp)
+                    list.Add(comp);
+            }
+            return list;
+        }
     }
 
     [Flags]

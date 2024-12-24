@@ -52,7 +52,7 @@ namespace GenshinRimpact
             Scribe_References.Look(ref instigator, "instigator");
             Scribe_Defs.Look(ref abilityDef, "abilityDef");
             Scribe_Collections.Look(ref affectedCells, "affectedCells");
-            Scribe_Collections.Look(ref hitThings, "hitThings");
+            Scribe_Collections.Look(ref hitThings, "hitThings", LookMode.Deep);
             Scribe_Values.Look(ref prevPos, "prevPos", parent.Position);
         }
 

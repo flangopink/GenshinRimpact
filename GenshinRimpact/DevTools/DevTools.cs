@@ -1,5 +1,6 @@
 ﻿using LudeonTK;
 using System.Text;
+using UnityEngine;
 using Verse;
 
 namespace GenshinRimpact
@@ -17,6 +18,15 @@ namespace GenshinRimpact
                 sb.AppendInNewLine($"Elem1: {data.firstElement}, Elem2: {data.secondElement}, Status: {data.status}, Reaction: {data.reaction}, Reaction Class: {item.Value}");
             }
             Log.Message(sb.ToString());
+        }
+
+        [DebugAction("Genshin Rimpact", "Spawn all visions", allowedGameStates = AllowedGameStates.PlayingOnMap, actionType = DebugActionType.ToolMap)]
+        public static void SpawnAllVisions()
+        {
+            foreach (var item in Utils.AllVisionsForReading)
+            {
+                GenPlace.TryPlaceThing(ThingMaker.MakeThing(item.Key), UI.MouseCell(), Find.CurrentMap, ThingPlaceMode.Near);
+            }
         }
     }
 }

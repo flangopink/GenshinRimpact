@@ -8,10 +8,9 @@ namespace GenshinRimpact
     public class HediffCompProperties_TurretGun : HediffCompProperties
     {
         public ThingDef turretDef;
-
         public float angleOffset;
-
         public bool autoAttack = true;
+        public int burstDelayTicks = 30;
 
         //public List<PawnRenderNodeProperties> renderNodeProperties;
 
@@ -38,7 +37,7 @@ namespace GenshinRimpact
     {
         private const int StartShootIntervalTicks = 10;
 
-        private static readonly CachedTexture ToggleTurretIcon = new("UI/Gizmos/ToggleTurret");
+        private static readonly CachedTexture ToggleTurretIcon = new("UI/Commands/HoldFire");
 
         public Thing gun;
 
@@ -180,7 +179,7 @@ namespace GenshinRimpact
                 currentTarget = (Thing)AttackTargetFinder.BestShootTargetFromCurrentPosition(this, TargetScanFlags.NeedThreat | TargetScanFlags.NeedAutoTargetable);
                 if (currentTarget.IsValid)
                 {
-                    burstWarmupTicksLeft = 1;
+                    burstWarmupTicksLeft = Props.burstDelayTicks;
                 }
                 else
                 {
@@ -197,10 +196,6 @@ namespace GenshinRimpact
 
         public override IEnumerable<Gizmo> CompGetGizmos()
         {
-            foreach (Gizmo item in base.CompGetGizmos())
-            {
-                yield return item;
-            }
             if (Thing is Pawn)
             {
                 Command_Toggle command_Toggle = new()

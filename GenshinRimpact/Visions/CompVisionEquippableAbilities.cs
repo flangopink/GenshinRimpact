@@ -7,6 +7,7 @@ namespace GenshinRimpact
     public class CompProperties_VisionEquippableAbilities : CompProperties
     {
         public VisionDef visionDef;
+        public bool doDescExtra;
 
         public override IEnumerable<string> ConfigErrors(ThingDef parentDef)
         {
@@ -19,6 +20,7 @@ namespace GenshinRimpact
         }
     }
 
+    [HotSwap.HotSwappable]
     public class CompVisionEquippableAbilities : CompEquippable
     {
         public CompProperties_VisionEquippableAbilities Props => (CompProperties_VisionEquippableAbilities)props;
@@ -26,6 +28,8 @@ namespace GenshinRimpact
         private List<Ability> abilities = [];
         private string hediffLabel;
         private Hediff hediff;
+        private string traitLabel;
+        private Trait trait;
 
         public List<Ability> AbilitiesForReading
         {
@@ -44,8 +48,11 @@ namespace GenshinRimpact
         }
         
         public bool HasHediff => Props.visionDef.hediff != null;
+        public bool HasTrait => Props.visionDef.trait != null;
         public string HediffLabel => hediffLabel ??= Props.visionDef.hediff.LabelCap;
+        public string TraitLabel => traitLabel ??= Props.visionDef.trait.DataAtDegree(Props.visionDef.traitDegree).LabelCap;
         public Hediff HediffForReading => hediff ??= HediffMaker.MakeHediff(Props.visionDef.hediff, Holder);
+        public Trait TraitForReading => trait ??= new(Props.visionDef.trait);
 
         public override void Initialize(CompProperties props)
         {
@@ -64,13 +71,35 @@ namespace GenshinRimpact
 
         public override string CompInspectStringExtra()
         {
-            string str = "Abilities".Translate() + ":";
-            foreach (Ability ab in AbilitiesForReading) 
-                str += "\n• " + ab.def.label;
-            if (HasHediff)
+            string str;
+            if (Props.doDescExtra)
             {
-                str += "\n" + "GR_Passives".Translate() + ":";
-                str += "\n• " + HediffLabel;
+                str = "Abilities".Translate() + ":";
+                foreach (Ability ab in AbilitiesForReading)
+                    str += "\n• " + ab.def.label;
+                if (HasHediff)
+                {
+                    str += "\n" + "GR_Passives".Translate() + ":";
+                    str += "\n• " + HediffLabel;
+                }
+                if (HasTrait)
+                {
+                    str += "\n" + "Traits".Translate() + ":";
+                    str += "\n• " + TraitLabel;
+                }
+            }
+            else
+            {
+                if (AbilitiesForReading.Count == 0)
+                {
+                    str = "GR_VisionDescriptionStatsOnly".Translate();
+                }
+                else if (HasHediff || HasTrait)
+                {
+                    str = "GR_VisionDescription".Translate();
+                }
+                else str = "GR_VisionDescriptionAbilitiesOnly".Translate();
+                str += "\n \n" + "GR_VisionDescriptionSeeTab".Translate($"[{"GR_TabVision".Translate()}]".Colorize(ColoredText.CurrencyColor)).Resolve();
             }
             return str;
         }
@@ -90,6 +119,9 @@ namespace GenshinRimpact
             }
             pawn.abilities.Notify_TemporaryAbilitiesChanged();
             if (HasHediff) pawn.health.AddHediff(HediffForReading);
+            if (HasTrait)
+                if (!pawn.story.traits.HasTrait(Props.visionDef.trait))
+                    pawn.story.traits.GainTrait(TraitForReading);
         }
 
         public override void Notify_Unequipped(Pawn pawn)
@@ -101,13 +133,17 @@ namespace GenshinRimpact
             }
             pawn.abilities.Notify_TemporaryAbilitiesChanged();
             if (HasHediff) pawn.health.RemoveHediff(HediffForReading);
+            if (HasTrait)
+                if (!pawn.story.traits.HasTrait(Props.visionDef.trait)) 
+                    pawn.story.traits.RemoveTrait(TraitForReading);
         }
 
         public override void PostExposeData()
         {
             base.PostExposeData();
-            Scribe_Collections.Look(ref abilities, "abilities");
+            Scribe_Collections.Look(ref abilities, "abilities", LookMode.Reference);
             Scribe_References.Look(ref hediff, "hediff");
+
             if (Scribe.mode == LoadSaveMode.PostLoadInit && Holder != null)
             {
                 foreach(Ability ability in AbilitiesForReading)
@@ -116,6 +152,7 @@ namespace GenshinRimpact
                     ability.verb.caster = Holder;
                 }
                 if (HasHediff) HediffForReading.pawn = Holder;
+                if (HasTrait) TraitForReading.pawn = Holder;
             }
         }
     }

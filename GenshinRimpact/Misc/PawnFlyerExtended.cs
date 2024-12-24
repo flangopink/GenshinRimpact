@@ -74,7 +74,7 @@ namespace GenshinRimpact
         {
             base.ExposeData();
             Scribe_References.Look(ref ability, "ability");
-            Scribe_Collections.Look(ref damagedPawns, "damagedPawns");
+            Scribe_Collections.Look(ref damagedPawns, "damagedPawns", LookMode.Deep);
         }
 
         // OLD DashingPawn CODE BELOW. TODO: DELETE LATER

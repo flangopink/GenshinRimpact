@@ -9,5 +9,8 @@ namespace GenshinRimpact
         public ElementDef element;
         public List<AbilityDef> abilities = [];
         public HediffDef hediff;
+        public TraitDef trait;
+        public int traitDegree = 0;
+        public bool mustBeCapableOfViolence = true;
     }
 }

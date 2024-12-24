@@ -53,7 +53,7 @@ namespace GenshinRimpact
         public override void PostExposeData()
         {
             base.PostExposeData();
-            Scribe_Collections.Look(ref spawnedThings, "spawnedThings");
+            Scribe_Collections.Look(ref spawnedThings, "spawnedThings", LookMode.Deep);
         }
     }
 }

@@ -54,6 +54,7 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
+    <Reference Include="System.Xml" />
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\RimWorld\RimWorldWin64_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
@@ -87,10 +88,11 @@
     <Compile Include="GenshinRimpact.cs" />
     <Compile Include="HediffComps\HediffComp_AoE.cs" />
     <Compile Include="HediffComps\HediffComp_ChargingAbility.cs" />
-    <Compile Include="HediffComps\HediffComp_DamageResistance.cs" />
+    <Compile Include="HediffComps\HediffComp_DamageMultiplier.cs" />
     <Compile Include="HediffComps\HediffComp_Draw.cs" />
     <Compile Include="HediffComps\HediffComp_DamageInfusion.cs" />
     <Compile Include="HediffComps\HediffComp_SpawnThing.cs" />
+    <Compile Include="HediffComps\HediffComp_VisionTipStringExtra.cs" />
     <Compile Include="Misc\AoEKnockbackParameters.cs" />
     <Compile Include="Misc\AoEParameters.cs" />
     <Compile Include="Misc\AoEShapeParameters.cs" />
@@ -143,6 +145,7 @@
     <Compile Include="Reactions\IElementalReaction.cs" />
     <Compile Include="Reactions\Reaction_Stun.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Visions\ITab_Vision.cs" />
     <Compile Include="Visions\VisionDef.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

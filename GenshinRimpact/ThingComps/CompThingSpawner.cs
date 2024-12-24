@@ -1,4 +1,8 @@
-﻿using Verse;
+﻿using RimWorld;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using Verse;
 
 namespace GenshinRimpact
 {
@@ -7,8 +11,12 @@ namespace GenshinRimpact
         public ThingDef spawnThing;
         public ThingDef spawnThingStuff;
         public EffecterDef effecter;
-        public bool spawnOnDestroy;
+        public bool spawnOnDestroy = true;
         public bool setFaction;
+
+        public bool shootsProjectiles;
+        public float projectileRadius = 2.9f;
+        public int projectileCount = 1;
 
         public CompProperties_ThingSpawner() => compClass = typeof(CompThingSpawner);
     }
@@ -41,10 +49,22 @@ namespace GenshinRimpact
             Props.effecter?.Spawn(pos, map).Cleanup();
             if (Props.spawnThing != null)
             {
-                Thing thing = ThingMaker.MakeThing(Props.spawnThing, Props.spawnThingStuff);
-                if (Props.setFaction) thing.SetFaction(parent.Faction); 
-                GenSpawn.CheckMoveItemsAside(pos, default, thing.def, map);
-                GenPlace.TryPlaceThing(thing, pos, map, ThingPlaceMode.Near);
+                if (Props.shootsProjectiles)
+                {
+                    var cells = GenRadial.RadialCellsAround(parent.PositionHeld, Props.projectileRadius, false).Where(x => x.InBounds(map));
+                    for (int i = 0; i < Props.projectileCount; i++)
+                    {
+                        Projectile proj = (Projectile)GenSpawn.Spawn(Props.spawnThing, pos, map);
+                        proj.Launch(parent, parent.DrawPos, cells.RandomElement(), null, ProjectileHitFlags.None, false);
+                    }
+                }
+                else
+                {
+                    Thing thing = ThingMaker.MakeThing(Props.spawnThing, Props.spawnThingStuff);
+                    if (Props.setFaction) thing.SetFaction(parent.Faction);
+                    GenSpawn.CheckMoveItemsAside(pos, default, thing.def, map);
+                    GenPlace.TryPlaceThing(thing, pos, map, ThingPlaceMode.Near);
+                }
             }
         }
     }
