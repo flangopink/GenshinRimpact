@@ -42,7 +42,7 @@ namespace GenshinRimpact
             Map map = Pawn.Map;
             if (map == null)
             {
-                Log.Error("Null map for CompAbilityDash");
+                Utils.LogError("Null map for CompAbilityFlyer");
                 return;
             }
 

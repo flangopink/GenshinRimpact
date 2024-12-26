@@ -12,7 +12,7 @@ namespace GenshinRimpact
         public int destroyAfterTicks = 300;
         public float range = 0.9f;
         public float minRange;
-        public EffecterDef startEffecter;
+        //public EffecterDef startEffecter;
         public EffecterDef spawnEffecter;
         public EffecterDef endEffecter;
         public IntRange spawnDelayTicks = IntRange.zero;

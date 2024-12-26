@@ -24,5 +24,7 @@ namespace GenshinRimpact
             base.PostExposeData();
             Scribe_References.Look(ref ownerAbility, "ownerAbility");
         }
+
+        public override string CompInspectStringExtra() => "Owner".Translate() + ": " + $"{ownerAbility.pawn.LabelCap}".Colorize(ColoredText.NameColor);
     }
 }

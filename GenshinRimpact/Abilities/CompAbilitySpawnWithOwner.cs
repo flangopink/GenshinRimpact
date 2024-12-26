@@ -32,8 +32,8 @@ namespace GenshinRimpact
             Thing t = ThingMaker.MakeThing(Props.thingDef);
             var comp = t.TryGetComp<CompHasOwner>();
             if (comp != null) comp.ownerAbility = parent;
-            else Log.Error(t.ToString() + " does not have CompHasOwner");
-            GenSpawn.Spawn(Props.thingDef, target.Cell, parent.pawn.Map);
+            else Utils.LogError(t.ToString() + " does not have CompHasOwner");
+            GenSpawn.Spawn(t, target.Cell, parent.pawn.Map);
             spawnedThings.Add(t);
         }
 
