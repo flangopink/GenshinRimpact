@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class AoEShapeParameters
     {

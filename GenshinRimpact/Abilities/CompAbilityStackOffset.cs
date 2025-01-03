@@ -2,7 +2,7 @@
 using RimWorld;
 using System.Collections.Generic;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_AbilityStackOffset : CompProperties_AbilityEffect
     {
@@ -78,7 +78,8 @@ namespace GenshinRimpact
         public override void PostExposeData()
         {
             base.PostExposeData();
-            Scribe_References.Look(ref shab, "shab"); 
+            Scribe_References.Look(ref shab, "shab");
         }
+        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled && Valid(target);
     }
 }

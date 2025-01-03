@@ -4,14 +4,14 @@ using HarmonyLib;
 using System.Linq;
 using System.Reflection;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     [StaticConstructorOnStartup]
-    public static class GenshinRimpact_Harmony
+    public static class Rimpact_Harmony
     {
-        static GenshinRimpact_Harmony()
+        static Rimpact_Harmony()
         {
-            Harmony harmony = new("flangopink.GenshinRimpact");
+            Harmony harmony = new("flangopink.Rimpact");
 
             // Shield Hediff
             harmony.Patch(AccessTools.Method(typeof(Pawn), "SpawnSetup"), null, new HarmonyMethod(typeof(Patches_HediffShieldManager), "OnPawnSpawn"));
@@ -26,8 +26,11 @@ namespace GenshinRimpact
 
             harmony.PatchAll();
 
-            Utils.LogMessage("Patched " + harmony.GetPatchedMethods().Count() + " patches!");
-            Utils.LogMessage("♥ Thank you for using GenshinRimpact v" + Assembly.GetExecutingAssembly().GetName().Version + "! ♥");
+            Utils.LogMessage("Loaded " + Utils.AllReactionsForReading.Count + " reactions, " 
+                                       + Utils.AllVisionsForReading.Count + " visions, "
+                                       + harmony.GetPatchedMethods().Count() + " patches!");
+            Utils.LogMessage("Assembly version: v" + Assembly.GetExecutingAssembly().GetName().Version);
+            Utils.LogMessage("♥ Thank you for using Rimpact! ♥");
         }
     }
 }

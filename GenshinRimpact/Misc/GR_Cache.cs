@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     [StaticConstructorOnStartup]
     public static class GR_Cache

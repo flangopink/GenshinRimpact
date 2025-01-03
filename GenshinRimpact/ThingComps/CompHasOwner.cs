@@ -1,7 +1,7 @@
 ﻿using RimWorld;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_HasOwner : CompProperties
     {

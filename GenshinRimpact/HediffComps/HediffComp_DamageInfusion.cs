@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class HediffCompProperties_DamageInfusion : HediffCompProperties
     {
@@ -9,6 +9,7 @@ namespace GenshinRimpact
         public float damageMultiplier = 1f;
         public float extraDamageAmount = -1f;
 
+        public bool sameDamageDef;
         public bool isExtra;
         public bool doMelee = true;
         public bool doRanged = true;
@@ -16,17 +17,20 @@ namespace GenshinRimpact
         public override IEnumerable<string> ConfigErrors(HediffDef parentDef)
         {
             foreach (var e in base.ConfigErrors(parentDef)) yield return e;
-            if (damageDef == null)
+            if (!sameDamageDef)
             {
-                yield return $"{parentDef} has HediffCompProperties_DamageInfusion but is missing a damageDef";
-            }
-            else if (damageDef.GetModExtension<ModExt_Element>() is not ModExt_Element ext)
-            {
-                yield return $"{parentDef} has HediffCompProperties_DamageInfusion but is missing ModExt_Element in its damageDef";
-            }
-            else if (ext.element == null)
-            {
-                yield return $"{parentDef} has HediffCompProperties_DamageInfusion but is missing <element> in its damageDef's ModExt_Element";
+                if (damageDef == null)
+                {
+                    yield return $"{parentDef} has HediffCompProperties_DamageInfusion but is missing a damageDef";
+                }
+                else if (damageDef.GetModExtension<ModExt_Element>() is not ModExt_Element ext)
+                {
+                    yield return $"{parentDef} has HediffCompProperties_DamageInfusion but is missing ModExt_Element in its damageDef";
+                }
+                else if (ext.element == null)
+                {
+                    yield return $"{parentDef} has HediffCompProperties_DamageInfusion but is missing <element> in its damageDef's ModExt_Element";
+                }
             }
         }
         public HediffCompProperties_DamageInfusion() => compClass = typeof(HediffComp_DamageInfusion);

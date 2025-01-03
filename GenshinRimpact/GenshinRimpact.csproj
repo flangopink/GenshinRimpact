@@ -8,8 +8,8 @@
     <ProjectGuid>{8AED77EA-FB6D-4C17-8E14-022ABB808C9F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>GenshinRimpact</RootNamespace>
-    <AssemblyName>GenshinRimpact</AssemblyName>
+    <RootNamespace>Rimpact</RootNamespace>
+    <AssemblyName>Rimpact</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>false</Deterministic>
@@ -20,7 +20,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\..\..\..\..\..\Program Files %28x86%29\Steam\steamapps\common\RimWorld\Mods\___GenshinRimpact\Assemblies\</OutputPath>
+    <OutputPath>..\..\..\..\..\..\..\Program Files %28x86%29\Steam\steamapps\common\RimWorld\Mods\____RimpactAbilityFramework\Assemblies\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -70,6 +70,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abilities\CompAbilityAoE.cs" />
+    <Compile Include="Abilities\CompAbilityStunSelf.cs" />
+    <Compile Include="Abilities\CompAbilityDestroyOwnedThings.cs" />
     <Compile Include="Abilities\CompAbilityHideGizmo.cs" />
     <Compile Include="Abilities\CompAbilityCancelEffect.cs" />
     <Compile Include="Abilities\CompAbilityDamageSelf.cs" />
@@ -77,7 +79,6 @@
     <Compile Include="Abilities\CompAbilityStackOffset.cs" />
     <Compile Include="Abilities\CompAbilityCooldownTimer.cs" />
     <Compile Include="Abilities\CompAbilityFlyer.cs" />
-    <Compile Include="Abilities\CompAbilityKnockback.cs" />
     <Compile Include="Abilities\CompAbilitySpawnWithOwner.cs" />
     <Compile Include="Abilities\CompAbilityTeleport.cs" />
     <Compile Include="Abilities\CompAbilityStackHandler.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Misc\AoEKnockbackParameters.cs" />
     <Compile Include="Misc\AoEParameters.cs" />
     <Compile Include="Misc\AoEShapeParameters.cs" />
+    <Compile Include="Misc\Verb_SpawnWithFaction.cs" />
     <Compile Include="Patches\Patches_DamageInfusion.cs" />
     <Compile Include="Patches\Patches_HediffShieldManager.cs" />
     <Compile Include="ModExtensions\ModExt_TurnInvisible.cs" />
@@ -112,9 +114,7 @@
     <Compile Include="ModExtensions\ModExt_Bezier.cs" />
     <Compile Include="ModExtensions\ModExt_Element.cs" />
     <Compile Include="Patches\Patch_EquipmentUtility_CanEquip.cs" />
-    <Compile Include="Patches\Patch_Invisibility_UpdateTarget_Transpiler.cs" />
-    <Compile Include="Patches\Patch_Pawn_HealthTracker_PreApplyDamage.cs" />
-    <Compile Include="Patches\Patch_StaggerHandler_StaggerFor_Transpiler.cs" />
+    <Compile Include="Patches\Patch_Pawn_TryGetAttackVerb.cs" />
     <Compile Include="PrivateFields.cs" />
     <Compile Include="Reactions\ElementalReactionDef.cs" />
     <Compile Include="Reactions\ElementCombo.cs" />
@@ -129,9 +129,12 @@
     <Compile Include="ThingComps\CompAnimatedOverlay.cs" />
     <Compile Include="ThingComps\CompDecoy.cs" />
     <Compile Include="ThingComps\CompDisappearAfterTicks.cs" />
+    <Compile Include="ThingComps\CompExplodeOnDestroyed.cs" />
     <Compile Include="ThingComps\CompHasOwner.cs" />
+    <Compile Include="ThingComps\CompHediffGiver_HPBased.cs" />
     <Compile Include="ThingComps\CompProjectileVFX.cs" />
     <Compile Include="ThingComps\CompAoESpawner.cs" />
+    <Compile Include="ThingComps\CompThingFaction.cs" />
     <Compile Include="ThingComps\CompThingSpawner.cs" />
     <Compile Include="UI\Command_AbilityCooldownTimer.cs" />
     <Compile Include="UI\Command_Invisible.cs" />

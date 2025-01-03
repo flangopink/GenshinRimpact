@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class ElementalReactionDef : Def
     {

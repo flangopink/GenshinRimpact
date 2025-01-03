@@ -1,6 +1,6 @@
 ﻿using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class HediffCompProperties_SpawnThing : HediffCompProperties
     {
@@ -22,7 +22,7 @@ namespace GenshinRimpact
             IntVec3 pos = parent.pawn.PositionHeld;
             Props.effecter?.Spawn(pos, map).Cleanup();
             Thing thing = ThingMaker.MakeThing(thingDef);
-            thing.SetFaction(parent.pawn.Faction);
+            Utils.TrySetFaction(thing, parent.pawn.Faction);
             GenSpawn.CheckMoveItemsAside(pos, default, thing.def, map);
             GenPlace.TryPlaceThing(thing, pos, map, ThingPlaceMode.Near);
         }

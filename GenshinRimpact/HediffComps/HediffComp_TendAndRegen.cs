@@ -4,7 +4,7 @@ using System.Text;
 using UnityEngine;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class HediffCompProperties_TendAndRegen : HediffCompProperties
     {
@@ -98,7 +98,7 @@ namespace GenshinRimpact
                 }
             }
             tickCounter = 0;
-            FleckMaker.AttachedOverlay(pawn, Props.fleckOnHeal, Vector3.zero);
+            if (Props.fleckOnHeal != null) FleckMaker.AttachedOverlay(pawn, Props.fleckOnHeal, Vector3.zero);
             if (Props.healOnce) healedOnce = true;
         }
 

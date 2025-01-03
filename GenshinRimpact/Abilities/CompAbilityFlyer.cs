@@ -2,7 +2,7 @@
 using Verse;
 using Verse.Sound;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_AbilityFlyer : CompProperties_AbilityEffect
     {
@@ -64,5 +64,6 @@ namespace GenshinRimpact
                 Utils.TryDoAbility(Pawn, Props.abilityOnFinish, target); //.Thing is Pawn p && Props.abilityOnFinish.verbProperties.targetParams.canTargetPawns ? p : target.Cell);
             }
         }
+        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled;
     }
 }

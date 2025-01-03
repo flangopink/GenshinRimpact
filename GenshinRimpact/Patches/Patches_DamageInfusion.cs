@@ -7,7 +7,7 @@ using System.Reflection.Emit;
 using UnityEngine;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public static class Patches_DamageInfusion
     {
@@ -49,11 +49,11 @@ namespace GenshinRimpact
                 {
                     if (hediffs[i].TryGetComp<HediffComp_DamageInfusion>() is HediffComp_DamageInfusion comp)
                     {
-                        if (comp.Props.damageDef != null)
+                        if (comp.Props.damageDef != null && !comp.Props.sameDamageDef)
                         {
                             dinfo.Def = comp.Props.damageDef;
-                            dinfo.SetAmount(dinfo.Amount * comp.Props.damageMultiplier);
                         }
+                        dinfo.SetAmount(dinfo.Amount * comp.Props.damageMultiplier);
                     }
                 }
             }
@@ -69,11 +69,14 @@ namespace GenshinRimpact
                 {
                     if (hediffs[i].TryGetComp<HediffComp_DamageInfusion>() is HediffComp_DamageInfusion comp)
                     {
-                        if (comp.Props.doMelee && comp.Props.damageDef != null)
+                        if (comp.Props.doMelee)
                         {
                             float dmg = __instance.verbProps.AdjustedMeleeDamageAmount(__instance, p);
                             float armorPenetration = __instance.verbProps.AdjustedArmorPenetration(__instance, p);
-                            DamageDef def = comp.Props.damageDef;
+                            DamageDef def;
+                            if (comp.Props.damageDef != null && !comp.Props.sameDamageDef)
+                                def = comp.Props.damageDef;
+                            else def = __instance.verbProps.meleeDamageDef;
                             BodyPartGroupDef bodyPartGroupDef;
                             HediffDef hediffDef = null;
                             QualityCategory qc = QualityCategory.Normal;

@@ -2,7 +2,7 @@
 using Verse;
 using Verse.Grammar;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class BattleLogEntry_DamageTakenAbility : BattleLogEntry_DamageTaken
     {

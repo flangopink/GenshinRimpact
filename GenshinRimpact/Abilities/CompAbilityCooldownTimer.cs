@@ -2,7 +2,7 @@
 using RimWorld;
 using System.Collections.Generic;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_AbilityCooldownTimer : CompProperties_AbilityEffect
     {
@@ -73,5 +73,6 @@ namespace GenshinRimpact
             Scribe_Values.Look(ref timerLeft, "timerLeft");
             Scribe_Values.Look(ref timerActive, "timerActive");
         }
+        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled;
     }
 }

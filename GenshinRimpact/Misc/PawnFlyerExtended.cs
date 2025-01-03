@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     [HotSwap.HotSwappable]
     public class PawnFlyerExtended : PawnFlyer // use vanilla pawnflyer with OnJumpCompleted instead

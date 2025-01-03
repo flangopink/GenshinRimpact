@@ -7,10 +7,8 @@ using UnityEngine;
 using Verse;
 using Verse.AI;
 using Verse.AI.Group;
-using static HarmonyLib.Code;
-using static UnityEngine.GraphicsBuffer;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
 
     [HotSwap.HotSwappable]
@@ -44,8 +42,7 @@ namespace GenshinRimpact
 
         static Utils()
         {
-            LogMessage("Constructor started!");
-
+            //LogMessage("Constructor started!");
             foreach (var element in DefDatabase<ElementDef>.AllDefsListForReading)
             {
                 //Log.Message("element - " + element);
@@ -66,7 +63,6 @@ namespace GenshinRimpact
                 }
                 ElementalFillBars.AddDistinct(element, SolidColorMaterials.NewSolidColorTexture(element.color));
             }
-            LogMessage("Loaded " + AllReactionsForReading.Count + " reactions!");
             foreach (var t in DefDatabase<ThingDef>.AllDefsListForReading)
             {
                 for (int i = 0; i < t.comps.Count; i++)
@@ -77,13 +73,12 @@ namespace GenshinRimpact
                     }
                 }
             }
-            LogMessage("Loaded " + AllVisionsForReading.Count + " visions!");
         }
 
-        public static void LogMessage(string str) => Log.Message("<color=#f4abba>[GenshinRimpact]</color> " + str);
-        public static void LogWarning(string str) => Log.Warning("<color=#f4abba>[GenshinRimpact]</color> " + str);
-        public static void LogError(string str) => Log.Error("<color=#f4abba>[GenshinRimpact]</color> " + str);
-        public static void LogErrorOnce(string str, int key) => Log.ErrorOnce("<color=#f4abba>[GenshinRimpact]</color> " + str, key);
+        public static void LogMessage(string str) => Log.Message("<color=#f4abba>[Rimpact]</color> " + str);
+        public static void LogWarning(string str) => Log.Warning("<color=#f4abba>[Rimpact]</color> " + str);
+        public static void LogError(string str) => Log.Error("<color=#f4abba>[Rimpact]</color> " + str);
+        public static void LogErrorOnce(string str, int key) => Log.ErrorOnce("<color=#f4abba>[Rimpact]</color> " + str, key);
 
         public static ElementalReactionDef GetReaction(ElementDef appliedElement, ElementDef otherElement, Status status)
         {
@@ -439,13 +434,15 @@ namespace GenshinRimpact
                 {
                     Thing thing = thingList[j];
                     //Log.Message(thing);
+                    if (thing == caster) ignoredThings.Add(thing);
+
                     // If not friendly, but only affect friendlies
                     if ((thing.Faction == null || thing.Faction.HostileTo(caster.Faction)) && onlyAffectFriendlies)
                     {
                         ignoredThings.Add(thing);
                         continue;
                     }
-                    if (thing.Faction != null && thing.Faction.IsPlayer)
+                    if (thing.Faction != null && thing.Faction.AllyOrNeutralTo(caster.Faction))
                     {
                         if (canFriendlyFire)
                         {
@@ -582,6 +579,33 @@ namespace GenshinRimpact
                 tmpKnockbackCells.Add(centerCell);
             }
             return tmpKnockbackCells;
+        }
+
+        public static void TrySetFaction(this Thing t, Faction faction)
+        {
+            if (t.def.CanHaveFaction)
+            {
+                t.SetFaction(faction);
+            }
+            else if (t.TryGetComp<CompThingFaction>() is CompThingFaction c)
+            {
+                c.ownerFaction = faction;
+            }
+            else LogWarning("Could not set faction on " + t + ". Forgot to add CompThingFaction?");
+        }
+        public static Faction TryGetFaction(this Thing t, Faction faction)
+        {
+            Faction f = t.Faction;
+            if (faction != null) return f;
+            if (t.TryGetComp<CompThingFaction>() is CompThingFaction c)
+            {
+                return c.ownerFaction;
+            }
+            else
+            {
+                LogWarning("Could not get faction on " + t + ". Forgot to add CompThingFaction?");
+                return null;
+            }
         }
 
         public static Thing SkipTo(Thing thing, IntVec3 cell, Map dest, EffecterDef entryEffecter, EffecterDef exitEffecter, bool doEffecter = true)

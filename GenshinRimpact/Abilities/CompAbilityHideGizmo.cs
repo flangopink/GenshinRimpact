@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_AbilityHideGizmo : CompProperties_AbilityEffect
     {
+        public AbilityDef otherAbility;
         public HediffDef hediff;
         public bool inverse;
-        //public AbilityDef ability;
 
         public CompProperties_AbilityHideGizmo() => compClass = typeof(CompAbilityHideGizmo);
     }
@@ -18,25 +18,33 @@ namespace GenshinRimpact
     {
         public new CompProperties_AbilityHideGizmo Props => (CompProperties_AbilityHideGizmo)props;
 
-        public override bool ShouldHideGizmo => Props.inverse ? LinkedHediff == null : LinkedHediff != null;
+        public override bool ShouldHideGizmo 
+        {
+            get 
+            {
+                //if (Props.otherAbility != null) return Props.inverse ? LinkedAbility.GizmosVisible() : !LinkedAbility.GizmosVisible();
+                if (Props.hediff != null) return Props.inverse ? LinkedHediff == null : LinkedHediff != null;
+                return false;
+            }
+        }
 
         private List<Hediff> PawnHediffs => parent.pawn.health.hediffSet.hediffs;
         private Hediff LinkedHediff
         {
             get
             {
-                if (Props.hediff != null)
+                for (int i = 0; i < PawnHediffs.Count; i++)
                 {
-                    for (int i = 0; i < PawnHediffs.Count; i++)
+                    if (PawnHediffs[i].def == Props.hediff)
                     {
-                        if (PawnHediffs[i].def == Props.hediff)
-                        {
-                            return PawnHediffs[i];
-                        }
+                        return PawnHediffs[i];
                     }
                 }
                 return null;
             }
         }
+        //private Ability LinkedAbility => parent.pawn.abilities.GetAbility(Props.otherAbility);
+
+        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled;
     }
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_AbilityShootMaxRange : CompProperties_AbilityEffect
     {
@@ -73,5 +73,6 @@ namespace GenshinRimpact
                 GenDraw.DrawFieldEdges(Utils.AffectedLineCells(ref tmpCells, Caster.Position, Utils.RedirectIntVec3ToMaxRange(Caster.Position, target.Cell, Caster.Map, Range), Caster.MapHeld, Range, true)); ;
             }
         }
+        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled && target.Thing is Pawn p && Caster.TargetCurrentlyAimingAt == p;
     }
 }

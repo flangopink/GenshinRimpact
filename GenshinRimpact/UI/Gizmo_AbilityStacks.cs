@@ -2,7 +2,7 @@
 using UnityEngine;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class Gizmo_AbilityStacks : Gizmo
     {

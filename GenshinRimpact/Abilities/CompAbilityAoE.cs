@@ -2,8 +2,10 @@
 using RimWorld;
 using System.Collections.Generic;
 using UnityEngine;
+using static HarmonyLib.Code;
+using System.Linq;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_AbilityAoE : CompProperties_AbilityEffect//EffectWithDest
     {
@@ -81,8 +83,11 @@ namespace GenshinRimpact
 
         public override void DrawEffectPreview(LocalTargetInfo target)
         {
-            switch (Params.shapeParams.shape) 
+            switch (Params.shapeParams.shape)
             {
+                case AoEShape.Radial:
+                    GenDraw.DrawFieldEdges(GenRadial.RadialCellsAround(target.Cell, Params.shapeParams.radius, true).ToList());
+                    break;
                 case AoEShape.HalfRadial:
                     GenDraw.DrawFieldEdges(Utils.GetHalfCircleCells(ref tmpCells, Pawn.Position, target.Cell, Pawn.MapHeld, Params.shapeParams.radius, Params.shapeParams.angleRad, false));
                     break;
@@ -102,6 +107,7 @@ namespace GenshinRimpact
             if (Params.knockbackParams != null && Params.knockbackParams.showLandingCells)
                 GenDraw.DrawFieldEdges(Utils.GetKnockbackCells(Pawn.Position, target.Cell, Pawn.MapHeld, Params.knockbackParams), Color.cyan);
         }
+        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled;
 
         /*public override void Initialize(AbilityCompProperties props)
         {

@@ -2,7 +2,7 @@
 using RimWorld;
 using System.Reflection;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public static class PrivateFields
     {

@@ -2,7 +2,7 @@
 using System.Linq;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_AbilityTeleport : CompProperties_AbilityEffect
     {
@@ -19,8 +19,6 @@ namespace GenshinRimpact
         public new CompProperties_AbilityTeleport Props => (CompProperties_AbilityTeleport)props;
         private Pawn Pawn => parent.pawn;
 
-        //public Thing teleportThing;
-
         public override void Apply(LocalTargetInfo target, LocalTargetInfo dest)
         {
             base.Apply(target, dest);
@@ -34,13 +32,8 @@ namespace GenshinRimpact
                 }
                 else Messages.Message("CannotUseAbility".Translate(parent.def.label) + ": " + "GR_TeleportDestinationDoesNotExist".Translate(), MessageTypeDefOf.RejectInput, false);
             }
-            else SkipUtility.SkipTo(Pawn, target.Cell, Pawn.MapHeld);
+            else Utils.SkipTo(Pawn, target.Cell, Pawn.MapHeld, Props.entryEffecter, Props.exitEffecter, Props.doEffecter);
         }
-
-        //public override void PostExposeData()
-        //{
-        //    base.PostExposeData();
-        //    Scribe_References.Look(ref teleportThing, "teleportThing");
-        //}
+        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled;
     }
 }

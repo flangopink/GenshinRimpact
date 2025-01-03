@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Verse;
 using Verse.AI;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class HediffCompProperties_TurretGun : HediffCompProperties
     {

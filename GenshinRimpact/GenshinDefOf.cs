@@ -1,7 +1,7 @@
 ﻿using RimWorld;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     [DefOf]
     public static class GenshinDefOf

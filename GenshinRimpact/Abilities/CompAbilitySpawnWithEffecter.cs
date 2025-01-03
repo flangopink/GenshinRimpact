@@ -1,7 +1,7 @@
 ﻿using RimWorld;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_AbilitySpawnWithEffecter : CompProperties_AbilityEffect
     {
@@ -20,7 +20,7 @@ namespace GenshinRimpact
         {
             base.Apply(target, dest);
             Thing t = GenSpawn.Spawn(Props.thingDef, target.Cell, parent.pawn.Map);
-            t.SetFaction(parent.pawn.Faction);
+            Utils.TrySetFaction(t, parent.pawn.Faction);
             Props.effecter?.Spawn(target.Cell, parent.pawn.Map).Cleanup();
         }
 
@@ -36,5 +36,6 @@ namespace GenshinRimpact
             }
             return true;
         }
+        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled;
     }
 }

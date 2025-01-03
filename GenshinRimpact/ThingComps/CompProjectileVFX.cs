@@ -1,6 +1,6 @@
 ﻿using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_ProjectileVFX : CompProperties
     {

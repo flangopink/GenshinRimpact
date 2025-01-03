@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_ThingSpawner : CompProperties
     {
@@ -61,7 +61,7 @@ namespace GenshinRimpact
                 else
                 {
                     Thing thing = ThingMaker.MakeThing(Props.spawnThing, Props.spawnThingStuff);
-                    if (Props.setFaction) thing.SetFaction(parent.Faction);
+                    Utils.TrySetFaction(thing, parent.Faction);
                     GenSpawn.CheckMoveItemsAside(pos, default, thing.def, map);
                     GenPlace.TryPlaceThing(thing, pos, map, ThingPlaceMode.Near);
                 }

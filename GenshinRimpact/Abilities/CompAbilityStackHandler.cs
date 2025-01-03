@@ -3,7 +3,7 @@ using RimWorld;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_AbilityStackHandler : AbilityCompProperties
     {
@@ -29,6 +29,8 @@ namespace GenshinRimpact
         {
             get => (float)currentStacks / maxStacks; // 2.0 / 6 = 0.33
         }
+
+        public override bool CanCast => currentStacks <= 0;
 
         public void OffsetStacks(int offset)
         {

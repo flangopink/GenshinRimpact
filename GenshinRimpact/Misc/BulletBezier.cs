@@ -2,7 +2,7 @@
 using RimWorld;
 using UnityEngine;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     [HotSwap.HotSwappable]
     public class BulletBezier : Bullet

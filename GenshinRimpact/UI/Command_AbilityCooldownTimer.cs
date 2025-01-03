@@ -1,7 +1,7 @@
 ﻿using RimWorld;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class Command_AbilityCooldownTimer(Ability ability, Pawn pawn) : Command_Ability(ability, pawn)
     {

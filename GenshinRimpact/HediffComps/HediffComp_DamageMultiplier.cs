@@ -2,7 +2,7 @@
 using System.Text;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class HediffCompProperties_DamageMultiplier : HediffCompProperties   // ignore it for now
     {

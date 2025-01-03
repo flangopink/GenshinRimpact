@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using Verse;
 using static RimWorld.PsychicRitualRoleDef;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     [HarmonyPatch(typeof(EquipmentUtility), "CanEquip",
             [typeof(Thing), typeof(Pawn), typeof(string), typeof(bool)],

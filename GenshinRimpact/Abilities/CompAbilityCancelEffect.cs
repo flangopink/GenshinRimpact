@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_AbilityCancelEffect : CompProperties_AbilityEffect
     {
@@ -34,5 +34,6 @@ namespace GenshinRimpact
                 }
             }
         }
+        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled;
     }
 }

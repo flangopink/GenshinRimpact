@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_AbilitySpawnWithOwner : CompProperties_AbilityEffect
     {
@@ -30,6 +30,7 @@ namespace GenshinRimpact
                 }
             }
             Thing t = ThingMaker.MakeThing(Props.thingDef);
+            Utils.TrySetFaction(t, parent.pawn.Faction);
             var comp = t.TryGetComp<CompHasOwner>();
             if (comp != null) comp.ownerAbility = parent;
             else Utils.LogError(t.ToString() + " does not have CompHasOwner");
@@ -55,5 +56,6 @@ namespace GenshinRimpact
             base.PostExposeData();
             Scribe_Collections.Look(ref spawnedThings, "spawnedThings", LookMode.Deep);
         }
+        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled;
     }
 }

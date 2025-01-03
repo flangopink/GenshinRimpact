@@ -1,4 +1,4 @@
-﻿namespace GenshinRimpact
+﻿namespace Rimpact
 {
     /*
     public enum Element

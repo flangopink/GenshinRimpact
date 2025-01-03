@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class HediffCompProperties_SeverityPerSecond : Verse.HediffCompProperties_SeverityPerSecond
     {

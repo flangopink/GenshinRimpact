@@ -1,7 +1,7 @@
 ﻿using RimWorld;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_AbilityDamageSelf : CompProperties_AbilityEffect
     {
@@ -27,5 +27,6 @@ namespace GenshinRimpact
             Find.BattleLog.Add(battleLog);
             dresult.AssociateWithLog(battleLog);
         }
+        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled;
     }
 }

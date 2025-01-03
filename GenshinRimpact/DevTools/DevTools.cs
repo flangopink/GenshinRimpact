@@ -1,9 +1,8 @@
 ﻿using LudeonTK;
 using System.Text;
-using UnityEngine;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public static class DevTools
     {

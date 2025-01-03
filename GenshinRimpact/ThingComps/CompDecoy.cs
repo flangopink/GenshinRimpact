@@ -2,7 +2,7 @@
 using Verse.AI;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_Decoy : CompProperties
     {
@@ -17,9 +17,6 @@ namespace GenshinRimpact
         public FactionFlags targetFlags;
         public EffecterDef effecterSpawned;
         public EffecterDef effecterDestroyed;
-        public bool explodeOnDestroy;
-        public float explosionRadius = 2.9f;
-        public DamageDef explosionDamageDef;
 
         public CompProperties_Decoy() => compClass = typeof(CompDecoy);
     }
@@ -60,10 +57,6 @@ namespace GenshinRimpact
             base.PostDestroy(mode, previousMap);
             IntVec3 pos = parent.PositionHeld;
             Props.effecterDestroyed?.Spawn(pos, previousMap).Cleanup();
-            if (Props.explodeOnDestroy)
-            {
-                GenExplosion.DoExplosion(pos, previousMap, Props.explosionRadius, Props.explosionDamageDef ?? DamageDefOf.Bomb, parent);
-            }
         }
 
         public void AggroNearbyPawns()

@@ -3,7 +3,7 @@ using System.Text;
 using UnityEngine;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     [HotSwap.HotSwappable]
     public class ITab_Vision : ITab

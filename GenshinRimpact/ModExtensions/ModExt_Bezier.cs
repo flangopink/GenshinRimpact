@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class ModExt_Bezier : DefModExtension
     {

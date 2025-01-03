@@ -4,7 +4,7 @@ using UnityEngine;
 using Verse;
 using Verse.Sound;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class HediffCompProperties_Shield : HediffCompProperties_Draw
     {

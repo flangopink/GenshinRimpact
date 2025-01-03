@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 
-namespace GenshinRimpact
+namespace Rimpact
 {
     public class CompProperties_DamageArea : CompProperties
     {
@@ -105,7 +105,7 @@ namespace GenshinRimpact
                 for (int j = 0; j < things.Count; j++)
                 {
                     var t = things[j];
-                    if (t.Faction == Faction.OfPlayer) continue;
+                    if (t.Faction == parent.Faction) continue;
                     if (Props.damagePawnsOnly && t is not Pawn) continue;
                     if (Props.onlyHitOnce && hitThings.Contains(t)) continue;
 
