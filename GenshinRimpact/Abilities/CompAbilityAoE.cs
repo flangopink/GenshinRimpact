@@ -2,7 +2,6 @@
 using RimWorld;
 using System.Collections.Generic;
 using UnityEngine;
-using static HarmonyLib.Code;
 using System.Linq;
 
 namespace Rimpact
@@ -62,6 +61,7 @@ namespace Rimpact
         //private int ticksLeftToApply;
         public override void Apply(LocalTargetInfo target, LocalTargetInfo dest)
         {
+            if (Props.aoeProperties.atCasterPos) target = Pawn.Position;
             base.Apply(target, dest);
             Utils.DoAoEAbility(target, Pawn, parent.def, Params.shapeParams, Params.damageAmount, Params.damageDef, Params.hediffDef, Params.hediffSeverity, Params.effecterOnTrigger, Params.isDirect, Params.canFriendlyFire, Params.onlyAffectFriendlies, Params.isExplosive, Params.explosionRadius, Props.screenShakeIntensity, Props.sound, Params.knockbackParams);
         }

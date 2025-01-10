@@ -19,7 +19,7 @@ namespace Rimpact
         public override void Apply(LocalTargetInfo target, LocalTargetInfo dest)
         {
             base.Apply(target, dest);
-            parent.pawn.stances.stunner.StunFor(Props.stunTicks, parent.pawn, false, Props.showMote);
+            parent.pawn.stances.stunner.StunFor(Props.stunTicks, parent.pawn, false, Props.showMote, false);
         }
         public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled;
     }

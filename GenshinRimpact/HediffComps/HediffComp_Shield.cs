@@ -8,7 +8,7 @@ namespace Rimpact
 {
     public class HediffCompProperties_Shield : HediffCompProperties_Draw
     {
-        //public GraphicData graphic;
+        //public GraphicData overrideGraphicData; // it's <graphic>
 
         public FleckDef absorbedFleck;
         public EffecterDef brokenEffecter;
@@ -33,7 +33,7 @@ namespace Rimpact
         public float energyPctOnReset = 0.2f;
         public int rechargeDelay = 180;
 
-        public List<ElementResistance> elementResistances;
+        public List<ElementalDamageFactor> elementalDamageFactors;
 
         //public bool blockRangedVerbs;
 
@@ -226,7 +226,7 @@ namespace Rimpact
                 float receivedDamage = dinfo.Amount;
                 if (dinfo.Def.GetModExtension<ModExt_Element>() is ModExt_Element ext)
                 {
-                    foreach (var res in Props.elementResistances)
+                    foreach (var res in Props.elementalDamageFactors)
                     {
                         if (res.element == ext.element)
                             receivedDamage *= res.factor;

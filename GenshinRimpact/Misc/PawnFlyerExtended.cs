@@ -67,6 +67,7 @@ namespace Rimpact
         protected override void RespawnPawn()
         {
             base.RespawnPawn();
+            compProps?.onFinishEffecter?.Spawn(Position, Map).Cleanup();
             damagedPawns.Clear();
         }
 

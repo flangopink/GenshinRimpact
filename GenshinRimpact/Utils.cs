@@ -23,6 +23,8 @@ namespace Rimpact
         public static readonly Dictionary<ReactionData, Type> AllReactionsForReading = [];
         public static readonly Dictionary<ThingDef, VisionDef> AllVisionsForReading = [];
 
+        public static readonly Settings settings;
+
         public static List<IntVec3> tmpConeCells = [];
 
         /*public static Color GetElementColor(Element element)
@@ -42,6 +44,7 @@ namespace Rimpact
 
         static Utils()
         {
+            settings = RimpactMod.Rimpact.GetSettings<Settings>();
             //LogMessage("Constructor started!");
             foreach (var element in DefDatabase<ElementDef>.AllDefsListForReading)
             {
@@ -156,6 +159,16 @@ namespace Rimpact
             GUI.DrawTexture(rect, fillTex);
             return result;
         }
+
+        /*public static Rect FillableCircleBar(Rect rect, float fillPercent, Texture2D fillTex, Texture2D bgTex, bool flip = false)
+        {
+            if (bgTex != null)
+            {
+                GUI.DrawTexture(rect, bgTex, ScaleMode.ScaleToFit, true, 1f, Color.white, 16, 90);
+            }
+            GUI.DrawTexture(rect, fillTex, ScaleMode.ScaleToFit, true, 1f, Color.white, 16, 90);
+            return rect;
+        }*/
 
         public static bool TargetFactionValid(this Pawn pawn, FactionFlags flags)
         {
@@ -504,7 +517,7 @@ namespace Rimpact
                                 if (knockbackParams.flyerDef != null)
                                 {
                                     bool isSelected = Find.Selector.IsSelected(pawn);
-                                    PawnFlyer pawnFlyer = PawnFlyer.MakeFlyer(knockbackParams.flyerDef, pawn, targetPos, knockbackParams.flyerEffecter, null);
+                                    PawnFlyer pawnFlyer = PawnFlyer.MakeFlyer(knockbackParams.flyerDef, pawn, targetPos, knockbackParams.flyerEffecter ?? null, null);
                                     if (pawnFlyer != null)
                                     {
                                         FleckMaker.ThrowDustPuff(targetPos.ToVector3Shifted() + Gen.RandomHorizontalVector(0.5f), map, 2f);
@@ -593,10 +606,9 @@ namespace Rimpact
             }
             else LogWarning("Could not set faction on " + t + ". Forgot to add CompThingFaction?");
         }
-        public static Faction TryGetFaction(this Thing t, Faction faction)
+        public static Faction TryGetFaction(this Thing t)
         {
-            Faction f = t.Faction;
-            if (faction != null) return f;
+            if (t.Faction != null) return t.Faction;
             if (t.TryGetComp<CompThingFaction>() is CompThingFaction c)
             {
                 return c.ownerFaction;

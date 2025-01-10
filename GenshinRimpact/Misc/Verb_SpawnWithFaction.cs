@@ -1,9 +1,9 @@
-﻿using Verse.AI;
-using Verse;
+﻿using Verse;
+using RimWorld;
 
 namespace Rimpact
 {
-    public class Verb_SpawnWithFaction : Verb_CastBase
+    public class Verb_SpawnWithFaction : Verb_CastAbility
     {
         protected override bool TryCastShot()
         {
@@ -11,6 +11,7 @@ namespace Rimpact
             {
                 return false;
             }
+            base.TryCastShot();
             Thing t = ThingMaker.MakeThing(verbProps.spawnDef);
             Utils.TrySetFaction(t, caster.Faction);
             GenSpawn.Spawn(t, currentTarget.Cell, caster.Map);

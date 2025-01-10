@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abilities\CompAbilityAoE.cs" />
+    <Compile Include="Abilities\CompAbilityEnergyUser.cs" />
     <Compile Include="Abilities\CompAbilityStunSelf.cs" />
     <Compile Include="Abilities\CompAbilityDestroyOwnedThings.cs" />
     <Compile Include="Abilities\CompAbilityHideGizmo.cs" />
@@ -85,8 +86,8 @@
     <Compile Include="Abilities\CompAbilityShootMaxRange.cs" />
     <Compile Include="DevTools\DevTools.cs" />
     <Compile Include="Elements\ElementDef.cs" />
-    <Compile Include="Elements\ElementResistance.cs" />
-    <Compile Include="GenshinRimpact.cs" />
+    <Compile Include="Elements\ElementalDamageFactor.cs" />
+    <Compile Include="Rimpact_Harmony.cs" />
     <Compile Include="HediffComps\HediffComp_AoE.cs" />
     <Compile Include="HediffComps\HediffComp_ChargingAbility.cs" />
     <Compile Include="HediffComps\HediffComp_DamageMultiplier.cs" />
@@ -97,6 +98,8 @@
     <Compile Include="Misc\AoEKnockbackParameters.cs" />
     <Compile Include="Misc\AoEParameters.cs" />
     <Compile Include="Misc\AoEShapeParameters.cs" />
+    <Compile Include="Misc\MapComponent_EnergyPool.cs" />
+    <Compile Include="Misc\Verb_CastAbilityJumpExt.cs" />
     <Compile Include="Misc\Verb_SpawnWithFaction.cs" />
     <Compile Include="Patches\Patches_DamageInfusion.cs" />
     <Compile Include="Patches\Patches_HediffShieldManager.cs" />
@@ -123,6 +126,7 @@
     <Compile Include="Reactions\Reaction_SpawnThing.cs" />
     <Compile Include="Reactions\Reaction_DoDamage.cs" />
     <Compile Include="Reactions\Reaction_SpreadElement.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="ThingComps\CompDamageArea.cs" />
     <Compile Include="ThingComps\CompElementalHandler.cs" />
     <Compile Include="Statuses\Status.cs" />
@@ -139,11 +143,11 @@
     <Compile Include="UI\Command_AbilityCooldownTimer.cs" />
     <Compile Include="UI\Command_Invisible.cs" />
     <Compile Include="UI\Gizmo_AbilityStacks.cs" />
+    <Compile Include="UI\Gizmo_EnergyPool.cs" />
     <Compile Include="UI\Gizmo_HediffEnergyShieldStatus.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Visions\CompVisionEquippableAbilities.cs" />
     <Compile Include="Elements\ElementColors.cs" />
-    <Compile Include="Elements\Element.cs" />
     <Compile Include="GenshinDefOf.cs" />
     <Compile Include="Reactions\IElementalReaction.cs" />
     <Compile Include="Reactions\Reaction_Stun.cs" />

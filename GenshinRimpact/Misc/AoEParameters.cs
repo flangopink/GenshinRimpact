@@ -21,5 +21,6 @@ namespace Rimpact
         public AoEKnockbackParameters knockbackParams = new();
 
         public bool isPlunging;
+        public bool atCasterPos;
     }
 }

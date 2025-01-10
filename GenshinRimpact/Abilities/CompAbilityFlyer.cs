@@ -29,16 +29,16 @@ namespace Rimpact
     }
 
     [HotSwap.HotSwappable]
-    public class CompAbilityFlyer : CompAbilityEffect, ICompAbilityEffectOnJumpCompleted
+    public class CompAbilityFlyer : CompAbilityEffect, ICompAbilityEffectOnJumpCompleted // Used with Verb_JumpExt
     {
         public new CompProperties_AbilityFlyer Props => (CompProperties_AbilityFlyer)props;
 
         private Pawn Pawn => parent.pawn;
 
-        public override void Apply(LocalTargetInfo target, LocalTargetInfo dest)
+        /*public override void Apply(LocalTargetInfo target, LocalTargetInfo dest)
         {
             base.Apply(target, dest);
-
+            
             Map map = Pawn.Map;
             if (map == null)
             {
@@ -46,16 +46,24 @@ namespace Rimpact
                 return;
             }
 
-            var dashingPawn = /*(DashingPawn)*/PawnFlyer.MakeFlyer(Props.flyerDef, Pawn, target.Cell, Props.flightEffecter, Props.endSound);
-            //dashingPawn.ability = parent;
-
-            //dashingPawn.target = target.Thing == null ? target.CenterVector3 : target.Thing.InteractionCell.ToVector3();
-
-            GenSpawn.Spawn(dashingPawn, Pawn.Position, map);
-
-            Props.startSound?.PlayOneShot(Pawn);
-            Props.onStartEffecter?.Spawn(Pawn.Position, map).Cleanup();
-        }
+            if (Props.flyerDef != null)
+            {
+                bool isSelected = Find.Selector.IsSelected(Pawn);
+                PawnFlyer pawnFlyer = PawnFlyer.MakeFlyer(Props.flyerDef, Pawn, target.Cell, Props.flightEffecter, Props.endSound);
+                if (pawnFlyer != null)
+                {
+                    Utils.LogMessage("b");
+                    FleckMaker.ThrowDustPuff(target.Cell.ToVector3Shifted() + Gen.RandomHorizontalVector(0.5f), map, 2f);
+                    GenSpawn.Spawn(pawnFlyer, target.Cell, map);
+                    if (isSelected)
+                    {
+                        Find.Selector.Select(Pawn, false, false);
+                    }
+                }
+                Props.startSound?.PlayOneShot(Pawn);
+                Props.onStartEffecter?.Spawn(target.Cell, map).Cleanup();
+            }
+        }*/
 
         public void OnJumpCompleted(IntVec3 origin, LocalTargetInfo target)
         {
@@ -64,6 +72,7 @@ namespace Rimpact
                 Utils.TryDoAbility(Pawn, Props.abilityOnFinish, target); //.Thing is Pawn p && Props.abilityOnFinish.verbProperties.targetParams.canTargetPawns ? p : target.Cell);
             }
         }
-        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled;
+
+        public override bool AICanTargetNow(LocalTargetInfo target) => !Pawn.IsColonistPlayerControlled;
     }
 }

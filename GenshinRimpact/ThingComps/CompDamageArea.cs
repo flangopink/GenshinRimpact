@@ -16,7 +16,7 @@ namespace Rimpact
         public int intervalTicks = 30; // 0.5 sec
 
         public bool onlyHitOnce;
-        public bool damagePawnsOnly;
+        public bool damagePawnsOnly = true;
 
         public float radius = 0.9f;
 
@@ -57,11 +57,11 @@ namespace Rimpact
 
         public override void PostExposeData()
         {
-            Scribe_References.Look(ref instigator, "instigator");
             Scribe_Defs.Look(ref abilityDef, "abilityDef");
+            Scribe_Values.Look(ref prevPos, "prevPos", parent.Position);
+            Scribe_References.Look(ref instigator, "instigator");
             Scribe_Collections.Look(ref affectedCells, "affectedCells");
             Scribe_Collections.Look(ref hitThings, "hitThings", LookMode.Deep);
-            Scribe_Values.Look(ref prevPos, "prevPos", parent.Position);
         }
 
         public override void PostDraw()
@@ -105,7 +105,7 @@ namespace Rimpact
                 for (int j = 0; j < things.Count; j++)
                 {
                     var t = things[j];
-                    if (t.Faction == parent.Faction) continue;
+                    if (t.Faction == parent.TryGetFaction()) continue;
                     if (Props.damagePawnsOnly && t is not Pawn) continue;
                     if (Props.onlyHitOnce && hitThings.Contains(t)) continue;
 

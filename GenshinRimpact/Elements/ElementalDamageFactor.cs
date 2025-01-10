@@ -1,6 +1,6 @@
 ﻿namespace Rimpact
 {
-    public class ElementResistance
+    public class ElementalDamageFactor
     {
         public ElementDef element;
         public float factor = 1f;
