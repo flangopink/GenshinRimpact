@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 
 namespace Rimpact
@@ -6,31 +7,34 @@ namespace Rimpact
     [HotSwap.HotSwappable]
     public class MapComponent_EnergyPool(Map map) : MapComponent(map)
     {
-        public float energy = 50f;
-        public float maxEnergy = 100f;
+        public readonly Dictionary<Pawn, float> PawnEnergyCostMultipliers = [];
 
         private Gizmo_EnergyPool gizmo;
         public Gizmo_EnergyPool Gizmo => gizmo ??= new Gizmo_EnergyPool(this);
-        public bool dontShowGizmo;
 
+        public float energy = -1f;
+        public float maxEnergy = 100f;
         public float EnergyPoolPercentage => energy / Mathf.Max(1f, maxEnergy);
 
-        /*public override void MapComponentOnGUI()
-        {
-            Vector2 vector = Event.current.mousePosition + new Vector2(15f, 15f);
-            Rect rect = new(vector.x, vector.y, 999f, 999f);
-            Text.Font = GameFont.Small;
-            DevGUI.Label(rect, energy.ToString());
-        }*/
+
+        public bool dontShowGizmo;
+
+        public float regenRateMultiplier = 1f;
+        public int RegenRate => (int)(Utils.settings.energyPoolRegenRateTicks * regenRateMultiplier);
 
         public override void FinalizeInit()
         {
             maxEnergy = Utils.settings.energyPoolMax;
         }
 
+        public override void MapGenerated()
+        {
+            if (energy == -1f) energy = maxEnergy;
+        }
+
         public override void MapComponentTick()
         {
-            if (map.IsHashIntervalTick(Utils.settings.energyPoolRegenRateTicks))
+            if (map.IsHashIntervalTick(RegenRate))
             {
                 UseEnergy(-1);
             }

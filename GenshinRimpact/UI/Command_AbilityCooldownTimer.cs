@@ -3,10 +3,11 @@ using Verse;
 
 namespace Rimpact
 {
+    [HotSwap.HotSwappable]
     public class Command_AbilityCooldownTimer(Ability ability, Pawn pawn) : Command_Ability(ability, pawn)
     {
-        private CompAbilityCooldownTimer comp;
-        private CompAbilityCooldownTimer Comp
+        private CompAbilityChargesCooldownTimer comp;
+        private CompAbilityChargesCooldownTimer Comp
         {
             get
             {
@@ -14,7 +15,7 @@ namespace Rimpact
                 {
                     foreach (CompAbilityEffect c in ability.EffectComps)
                     {
-                        if (c is CompAbilityCooldownTimer timerComp)
+                        if (c is CompAbilityChargesCooldownTimer timerComp)
                         {
                             comp = timerComp;
                         }
@@ -25,7 +26,6 @@ namespace Rimpact
         }
         private string TimerSecondsString => Comp?.TimerSeconds.ToString("0.0") + "LetterSecond".Translate();
 
-        public override string TopRightLabel => ability.GizmoExtraLabel + (Comp != null ? ("\n" + TimerSecondsString) : "");
-
+        public override string TopRightLabel => ability.GizmoExtraLabel + (Comp != null ? ($"\n{TimerSecondsString} - {Comp.charges}/{Comp.Props.maxCharges}") : "");
     }
 }

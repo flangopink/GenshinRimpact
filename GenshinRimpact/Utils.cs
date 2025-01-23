@@ -3,6 +3,8 @@ using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
+using System.Security.Cryptography;
 using UnityEngine;
 using Verse;
 using Verse.AI;
@@ -27,20 +29,7 @@ namespace Rimpact
 
         public static List<IntVec3> tmpConeCells = [];
 
-        /*public static Color GetElementColor(Element element)
-        {
-            return element switch
-            {
-                Element.Pyro => ElementColors.Pyro,
-                Element.Hydro => ElementColors.Hydro,
-                Element.Anemo => ElementColors.Anemo,
-                Element.Electro => ElementColors.Electro,
-                Element.Dendro => ElementColors.Dendro,
-                Element.Cryo => ElementColors.Cryo,
-                Element.Geo => ElementColors.Geo,
-                _ => Color.white,
-            };
-        }*/
+        //public static GameComponent_HediffDynamicManager DynamicHediffs => Current.Game.GetComponent<GameComponent_HediffDynamicManager>();
 
         static Utils()
         {
@@ -457,7 +446,7 @@ namespace Rimpact
                     }
                     if (thing.Faction != null && thing.Faction.AllyOrNeutralTo(caster.Faction))
                     {
-                        if (canFriendlyFire)
+                        if (settings.enableFriendlyFire && canFriendlyFire)
                         {
                             //Log.Message("added player");
                             affectedThings.Add(thing); // affect if can friendly fire
@@ -693,6 +682,45 @@ namespace Rimpact
             }
             return list;
         }
+
+        /*public static HediffDefExposable MakeHediffDynamicDef(HediffData h)
+        {
+            if (h == null)
+            {
+                LogError("Tried making a dynamic hediff with null HediffData");
+                return null;
+            }
+            HediffDefExposable def = new()
+            {
+                defName = h.defName,
+                label = h.label,
+                description = h.description,
+                hediffClass = typeof(HediffWithComps),
+                defaultLabelColor = h.visionDef?.element?.color ?? Color.white,
+                stage = h.stage,
+                descriptionHyperlinks = h.visionDef != null ? [h.visionDef] : null,
+                generated = true,
+                comps = []
+            };
+            def.comps.Add(new HediffCompProperties_Dynamic() { });
+            if (h.extraString && h.visionDef != null) def.comps.Add(new HediffCompProperties_VisionTipStringExtra() { visionDef = h.visionDef });
+            //def.modContentPack?.AddDef(def, "Rimpact");
+            def.PostLoad();
+            if (DefDatabase<HediffDef>.GetNamed(def.defName, false) == null)
+            {
+                DefDatabase<HediffDef>.Add(def);
+            }
+            return def;
+        }*/
+
+        /*public static void RemoveDynamicDef<T>(T def) where T : Def
+        {
+            PrivateFields.ModContentPack_defs.SetValue(def, def.modContentPack.AllDefs.Except(def));
+            if (DefDatabase<T>.GetNamed(def.defName) != null)
+            {
+                PrivateFields.HediffDefDatabase_defs.SetValue(def, def.modContentPack.AllDefs.Except(def));
+            }
+        }*/
     }
 
     [Flags]

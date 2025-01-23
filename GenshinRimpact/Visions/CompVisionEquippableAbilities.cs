@@ -31,6 +31,8 @@ namespace Rimpact
         private string traitLabel;
         private Trait trait;
 
+        private HediffDataStage hediffDataStage;
+
         public List<Ability> AbilitiesForReading
         {
             get
@@ -47,7 +49,7 @@ namespace Rimpact
             }
         }
         
-        public bool HasHediff => Props.visionDef.hediff != null;
+        public bool HasHediff => Utils.settings.enableVisionPassives && Props.visionDef.hediff != null;
         public bool HasTrait => Props.visionDef.trait != null;
         public string HediffLabel => hediffLabel ??= Props.visionDef.hediff.LabelCap;
         public string TraitLabel => traitLabel ??= Props.visionDef.trait.DataAtDegree(Props.visionDef.traitDegree).LabelCap;
@@ -66,6 +68,11 @@ namespace Rimpact
                     ability.verb.caster = Holder;
                 }
                 if (HasHediff) HediffForReading.pawn = Holder;
+                else
+                {
+                    if (Holder.health.hediffSet.HasHediff(HediffForReading.def))
+                        Holder.health.RemoveHediff(HediffForReading);
+                }
             }
         }
 
@@ -118,7 +125,15 @@ namespace Rimpact
                 pawn.abilities.abilities.Add(ability);
             }
             pawn.abilities.Notify_TemporaryAbilitiesChanged();
-            if (HasHediff) pawn.health.AddHediff(HediffForReading);
+            if (HasHediff)
+            {
+                pawn.health.AddHediff(HediffForReading);
+                hediffDataStage = new HediffDataStage(pawn, HediffForReading.CurStage, Props.visionDef);
+                //Utils.DynamicHediffs.StagePawns.Add(hediffDataStage);
+                //Utils.LogMessage(Utils.DynamicHediffs.StagePawns.Count.ToString());
+                //if (pawn.GetComp<CompDynamicHediff>() is var comp)
+                //    comp.shouldUpdate = true;
+            }
             if (HasTrait)
                 if (!pawn.story.traits.HasTrait(Props.visionDef.trait))
                     pawn.story.traits.GainTrait(TraitForReading);
@@ -132,7 +147,13 @@ namespace Rimpact
                 pawn.abilities.abilities.Remove(ability);
             }
             pawn.abilities.Notify_TemporaryAbilitiesChanged();
-            if (HasHediff) pawn.health.RemoveHediff(HediffForReading);
+            if (HasHediff) 
+            { 
+                pawn.health.RemoveHediff(HediffForReading);
+                //Utils.DynamicHediffs.StagePawns.Remove(hediffDataStage);
+                //if (pawn.GetComp<CompDynamicHediff>() is var comp)
+                //    comp.shouldUpdate = true;
+            }
             if (HasTrait)
                 if (!pawn.story.traits.HasTrait(Props.visionDef.trait)) 
                     pawn.story.traits.RemoveTrait(TraitForReading);
@@ -141,8 +162,9 @@ namespace Rimpact
         public override void PostExposeData()
         {
             base.PostExposeData();
-            Scribe_Collections.Look(ref abilities, "abilities", LookMode.Reference);
+            Scribe_Collections.Look(ref abilities, "abilities", LookMode.Deep);
             Scribe_References.Look(ref hediff, "hediff");
+            Scribe_Deep.Look(ref hediffDataStage, "hediffDataStage");
 
             if (Scribe.mode == LoadSaveMode.PostLoadInit && Holder != null)
             {

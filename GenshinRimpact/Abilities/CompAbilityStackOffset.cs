@@ -64,7 +64,7 @@ namespace Rimpact
         {
             if (Props.cantUseWhenEmpty && sh.currentStacks == 0)
             {
-                Messages.Message("GR_CantUseAbilityNotEnoughStacks".Translate(Props.stackName, Props.amount), MessageTypeDefOf.RejectInput, false);
+                Messages.Message("GR_CantUseAbilityNotEnoughStacks".Translate(Props.stackName), MessageTypeDefOf.RejectInput, false);
                 return false;
             }
             else if (Props.requiresExactAmount && sh.currentStacks - Props.amount < 0)

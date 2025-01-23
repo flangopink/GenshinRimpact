@@ -115,11 +115,15 @@ namespace Rimpact
                 Widgets.Label(rect2, "GR_Passives".Translate() + ":");
                 rect2.y += 24f;
                 StringBuilder sb = new();
-                foreach (var stat in HediffStatsUtility.SpecialDisplayStats(hediff.stages[0], null))
+                if (Utils.settings.enableVisionPassives)
                 {
-                    sb.AppendLine($"  {stat.ValueString} {stat.LabelCap}");
+                    foreach (var stat in HediffStatsUtility.SpecialDisplayStats(hediff.stages[0], null))
+                    {
+                        sb.AppendLine($"  {stat.ValueString} {stat.LabelCap}");
+                    }
+                    tmpString = sb.ToString();
                 }
-                tmpString = sb.ToString();
+                else tmpString = "Rimpact_DisabledInModSettings".Translate();
                 Widgets.Label(rect2, tmpString);
                 rect2.y += Text.CalcHeight(tmpString, rect2.width) * 0.675f;
                 if (hediff.comps != null)

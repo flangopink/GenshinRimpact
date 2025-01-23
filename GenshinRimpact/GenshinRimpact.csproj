@@ -78,7 +78,7 @@
     <Compile Include="Abilities\CompAbilityDamageSelf.cs" />
     <Compile Include="Abilities\CompAbilitySpawnWithEffecter.cs" />
     <Compile Include="Abilities\CompAbilityStackOffset.cs" />
-    <Compile Include="Abilities\CompAbilityCooldownTimer.cs" />
+    <Compile Include="Abilities\CompAbilityChargesCooldownTimer.cs" />
     <Compile Include="Abilities\CompAbilityFlyer.cs" />
     <Compile Include="Abilities\CompAbilitySpawnWithOwner.cs" />
     <Compile Include="Abilities\CompAbilityTeleport.cs" />
@@ -87,6 +87,10 @@
     <Compile Include="DevTools\DevTools.cs" />
     <Compile Include="Elements\ElementDef.cs" />
     <Compile Include="Elements\ElementalDamageFactor.cs" />
+    <Compile Include="HediffComps\HediffComp_EnergyRegenMultiplier.cs" />
+    <Compile Include="HediffComps\HediffComp_EnergyCostMultiplier.cs" />
+    <Compile Include="Misc\HediffData.cs" />
+    <Compile Include="Misc\HediffDynamic.cs" />
     <Compile Include="Rimpact_Harmony.cs" />
     <Compile Include="HediffComps\HediffComp_AoE.cs" />
     <Compile Include="HediffComps\HediffComp_ChargingAbility.cs" />
@@ -126,7 +130,8 @@
     <Compile Include="Reactions\Reaction_SpawnThing.cs" />
     <Compile Include="Reactions\Reaction_DoDamage.cs" />
     <Compile Include="Reactions\Reaction_SpreadElement.cs" />
-    <Compile Include="Settings.cs" />
+    <Compile Include="Settings\Settings.cs" />
+    <Compile Include="Settings\SettingsEnums.cs" />
     <Compile Include="ThingComps\CompDamageArea.cs" />
     <Compile Include="ThingComps\CompElementalHandler.cs" />
     <Compile Include="Statuses\Status.cs" />
@@ -148,13 +153,14 @@
     <Compile Include="Utils.cs" />
     <Compile Include="Visions\CompVisionEquippableAbilities.cs" />
     <Compile Include="Elements\ElementColors.cs" />
-    <Compile Include="GenshinDefOf.cs" />
+    <Compile Include="Rimpact_DefOf.cs" />
     <Compile Include="Reactions\IElementalReaction.cs" />
     <Compile Include="Reactions\Reaction_Stun.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Visions\ITab_Vision.cs" />
     <Compile Include="Visions\VisionDef.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

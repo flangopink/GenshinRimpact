@@ -25,17 +25,29 @@ namespace Rimpact
         private bool startedCasting;
         private bool alreadyUsed;
 
-        public override bool CanCast => pool.energy - Props.energyUsage >= 0;
-        public string EnergyTooltip => Props.energyUsage > 0 ? "GR_EnergyCost".Translate(Props.energyUsage.ToString().Colorize(ColoredText.TipSectionTitleColor)).Resolve()
-                                                             : "GR_EnergyGain".Translate((-Props.energyUsage).ToString().Colorize(ColoredText.ExpectationsColor)).Resolve();
+        public float EnergyUsage
+        {
+            get
+            {
+                if (Props.energyUsage > 0 && pool != null && pool.PawnEnergyCostMultipliers.TryGetValue(parent.pawn, out float mult))
+                {
+                    return Props.energyUsage * mult;
+                }
+                return Props.energyUsage;
+            }
+        }
+        public bool HasEnoughEnergy => pool.energy - EnergyUsage >= 0;
+        //public override bool CanCast => pool.energy - EnergyUsage >= 0;
+        public string EnergyTooltip => EnergyUsage > 0 ? "GR_EnergyCost".Translate(EnergyUsage.ToString().Colorize(ColoredText.TipSectionTitleColor)).Resolve()
+                                                       : "GR_EnergyGain".Translate((-EnergyUsage).ToString().Colorize(ColoredText.ExpectationsColor)).Resolve();
 
         public override void Initialize(AbilityCompProperties props)
         {
             base.Initialize(props);
             pool = parent.pawn.MapHeld.GetComponent<MapComponent_EnergyPool>();
             if (pool == null) Utils.LogError($"Error in {parent}: MapComponent_EnergyPool is null.");
-            usageTickInterval = Props.instaUse ? 0 : Mathf.Max(1, (int)(parent.VerbProperties[0].warmupTime.SecondsToTicks() / Mathf.Abs(Props.energyUsage)));
-            sign = Math.Sign(Props.energyUsage);
+            usageTickInterval = Props.instaUse ? 0 : Mathf.Max(1, (int)(parent.VerbProperties[0].warmupTime.SecondsToTicks() / Mathf.Abs(EnergyUsage)));
+            sign = Math.Sign(EnergyUsage);
         }
 
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
@@ -52,13 +64,13 @@ namespace Rimpact
                 if (!startedCasting && parent.Casting)
                 {
                     startedCasting = true;
-                    usageTicksLeft = (int)Mathf.Abs(Props.energyUsage);
+                    usageTicksLeft = (int)Mathf.Abs(EnergyUsage);
                 }
                 if (startedCasting && usageTicksLeft > 0)
                 {
                     if (usageTickInterval == 0 && !alreadyUsed)
                     {
-                        pool.UseEnergy(Props.energyUsage);
+                        pool.UseEnergy(EnergyUsage);
                         alreadyUsed = true;
                         startedCasting = false;
                         return;
@@ -73,7 +85,7 @@ namespace Rimpact
         {
             if (Find.TickManager.TicksGame % usageTickInterval == 0)
             {
-                if (pool.energy == 0 && Props.energyUsage > 0)
+                if (pool.energy == 0 && EnergyUsage > 0)
                 {
                     parent.pawn.stances.stunner.StunFor(Utils.settings.interruptedAbilityStunDuration, parent.pawn, false, true, false);
                     parent.pawn.jobs.StopAll();
@@ -97,14 +109,24 @@ namespace Rimpact
             return EnergyTooltip;
         }
 
+        public override bool Valid(LocalTargetInfo target, bool throwMessages = false)
+        {
+            if(!HasEnoughEnergy)
+            {
+                Messages.Message("GR_TargetingCancelledNotEnoughEnergy".Translate(parent.pawn.LabelCap), MessageTypeDefOf.RejectInput, false);
+                Find.Targeter.StopTargeting();
+                return false;
+            }
+            return base.Valid(target, throwMessages);
+        }
+
         /*public override void PostApplied(List<LocalTargetInfo> targets, Map map)
         {
-            pool.UseEnergy(Props.energyUsage);
         }*/
 
         public override bool GizmoDisabled(out string reason)
         {
-            if (!CanCast)
+            if (!HasEnoughEnergy)
             {
                 reason = "GR_NotEnoughEnergy".Translate();
                 return true;
@@ -112,7 +134,7 @@ namespace Rimpact
             return base.GizmoDisabled(out reason);
         }
 
-        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled;
+        public override bool AICanTargetNow(LocalTargetInfo target) => !parent.pawn.IsColonistPlayerControlled && HasEnoughEnergy;
 
         public override void PostExposeData()
         {

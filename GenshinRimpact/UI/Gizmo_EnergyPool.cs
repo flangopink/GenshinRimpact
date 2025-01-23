@@ -59,7 +59,7 @@ namespace Rimpact
 
             // Reset to avoid GUI errors
             Text.Anchor = TextAnchor.UpperLeft;
-            TooltipHandler.TipRegion(rect2, "GR_EnergyPoolGizmoTip".Translate());
+            TooltipHandler.TipRegion(rect2, "GR_EnergyPoolGizmoTip".Translate() + "\n\n" + "GR_EnergyRegenRate".Translate() + ": " + pool.RegenRate.ToStringTicksToPeriod());
             return new GizmoResult(GizmoState.Clear);
         }
     }
