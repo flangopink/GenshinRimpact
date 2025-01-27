@@ -9,7 +9,7 @@ namespace Rimpact
     {
         public string _label;
         public Color _color;
-        public HediffDataStage _cachedStageData;
+        public HediffStageData _cachedStageData;
         private HediffStage _stage;
 
         public override string Label
@@ -34,7 +34,7 @@ namespace Rimpact
             }
         }
 
-        public void ApplyValues(string label, Color color, HediffDataStage stageData)
+        public void ApplyValues(string label, Color color, HediffStageData stageData)
         {
             _label = label;
             _color = color;

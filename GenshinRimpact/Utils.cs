@@ -3,8 +3,6 @@ using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
-using System.Security.Cryptography;
 using UnityEngine;
 using Verse;
 using Verse.AI;
@@ -12,7 +10,6 @@ using Verse.AI.Group;
 
 namespace Rimpact
 {
-
     [HotSwap.HotSwappable]
     [StaticConstructorOnStartup]
     public static class Utils
@@ -25,6 +22,10 @@ namespace Rimpact
         public static readonly Dictionary<ReactionData, Type> AllReactionsForReading = [];
         public static readonly Dictionary<ThingDef, VisionDef> AllVisionsForReading = [];
 
+        //public static readonly Dictionary<(StatDef stat, bool isFactor), (float min, float max)> HediffStatModifierPool = [];
+        public static Dictionary<StatDef, (float min, float max)> StatOffsetsPool = [];
+        public static Dictionary<StatDef, (float min, float max)> StatFactorsPool = [];
+
         public static readonly Settings settings;
 
         public static List<IntVec3> tmpConeCells = [];
@@ -34,7 +35,14 @@ namespace Rimpact
         static Utils()
         {
             settings = RimpactMod.Rimpact.GetSettings<Settings>();
-            //LogMessage("Constructor started!");
+            LoadElementsAndReactions();
+            LoadVisions();
+            LoadStatModifiers();
+        }
+
+        #region -- Constructor --
+        private static void LoadElementsAndReactions()
+        {
             foreach (var element in DefDatabase<ElementDef>.AllDefsListForReading)
             {
                 //Log.Message("element - " + element);
@@ -55,6 +63,9 @@ namespace Rimpact
                 }
                 ElementalFillBars.AddDistinct(element, SolidColorMaterials.NewSolidColorTexture(element.color));
             }
+        }
+        private static void LoadVisions()
+        {
             foreach (var t in DefDatabase<ThingDef>.AllDefsListForReading)
             {
                 for (int i = 0; i < t.comps.Count; i++)
@@ -66,11 +77,66 @@ namespace Rimpact
                 }
             }
         }
+        private static void LoadStatModifiers()
+        {
+            StatDef stat;
+            float val;
+            (float min, float max) minmax;
+            foreach (var h in DefDatabase<HediffDef>.AllDefsListForReading.Where(x => x.stages != null && x.tags != null && x.tags.Contains("Rimpact")))
+            {
+                for (int i = 0; i < h.stages.Count; i++)
+                {
+                    if (h.stages[i].statOffsets != null)
+                    {
+                        for (int k = 0; k < h.stages[i].statOffsets.Count; k++)
+                        {
+                            stat = h.stages[i].statOffsets[k].stat;
+                            val = h.stages[i].statOffsets[k].value;
+                            if (StatOffsetsPool.ContainsKey(stat))
+                            {
+                                minmax = StatOffsetsPool[stat];
+                                minmax.min = Mathf.Min(minmax.min, val);
+                                minmax.max = Mathf.Max(minmax.max, val);
+                                StatOffsetsPool[stat] = minmax;
+                            }
+                            else
+                            {
+                                StatOffsetsPool.Add(stat, (val, val));
+                            }
+                        }
+                    }
+                    if (h.stages[i].statFactors != null)
+                    {
+                        for (int k = 0; k < h.stages[i].statFactors.Count; k++)
+                        {
+                            stat = h.stages[i].statFactors[k].stat;
+                            val = h.stages[i].statFactors[k].value;
+                            if (StatFactorsPool.ContainsKey(stat))
+                            {
+                                minmax = StatFactorsPool[stat];
+                                minmax.min = Mathf.Min(minmax.min, val);
+                                minmax.max = Mathf.Max(minmax.max, val);
+                                StatFactorsPool[stat] = minmax;
+                            }
+                            else
+                            {
+                                StatFactorsPool.Add(stat, (val, val));
+                            }
+                        }
+                    }
+                }
+            }
+            LogMessage($"Offsets: {StatOffsetsPool.Count}, Factors: {StatFactorsPool.Count}");
+            //LogMessage(HediffStatModifierPool.ToStringFullContents());
+        }
+        #endregion
 
+        #region -- Logs --
         public static void LogMessage(string str) => Log.Message("<color=#f4abba>[Rimpact]</color> " + str);
         public static void LogWarning(string str) => Log.Warning("<color=#f4abba>[Rimpact]</color> " + str);
         public static void LogError(string str) => Log.Error("<color=#f4abba>[Rimpact]</color> " + str);
         public static void LogErrorOnce(string str, int key) => Log.ErrorOnce("<color=#f4abba>[Rimpact]</color> " + str, key);
+        #endregion
 
         public static ElementalReactionDef GetReaction(ElementDef appliedElement, ElementDef otherElement, Status status)
         {
@@ -683,44 +749,52 @@ namespace Rimpact
             return list;
         }
 
-        /*public static HediffDefExposable MakeHediffDynamicDef(HediffData h)
+        public static HediffDataStatModifier GetStatModifierFromKVP(this KeyValuePair<StatDef, (float min, float max)> kvp)
         {
-            if (h == null)
-            {
-                LogError("Tried making a dynamic hediff with null HediffData");
-                return null;
-            }
-            HediffDefExposable def = new()
-            {
-                defName = h.defName,
-                label = h.label,
-                description = h.description,
-                hediffClass = typeof(HediffWithComps),
-                defaultLabelColor = h.visionDef?.element?.color ?? Color.white,
-                stage = h.stage,
-                descriptionHyperlinks = h.visionDef != null ? [h.visionDef] : null,
-                generated = true,
-                comps = []
-            };
-            def.comps.Add(new HediffCompProperties_Dynamic() { });
-            if (h.extraString && h.visionDef != null) def.comps.Add(new HediffCompProperties_VisionTipStringExtra() { visionDef = h.visionDef });
-            //def.modContentPack?.AddDef(def, "Rimpact");
-            def.PostLoad();
-            if (DefDatabase<HediffDef>.GetNamed(def.defName, false) == null)
-            {
-                DefDatabase<HediffDef>.Add(def);
-            }
-            return def;
-        }*/
+            return new() { stat = kvp.Key, value = Rand.Range(kvp.Value.min, kvp.Value.max) };
+        }
 
-        /*public static void RemoveDynamicDef<T>(T def) where T : Def
+        public static HediffStageData MakeRandomHediffStageData(IntRange totalStats, Pawn pawn = null, VisionDef vision = null)
         {
-            PrivateFields.ModContentPack_defs.SetValue(def, def.modContentPack.AllDefs.Except(def));
-            if (DefDatabase<T>.GetNamed(def.defName) != null)
+            HediffStageData data = new() { pawn = pawn, vision = vision };
+
+            int a = settings.offsetWeight;
+            int b = settings.factorWeight;
+            int c = settings.traitWeight;
+            float total = a + b + c;
+
+            for (int i = 0; i < totalStats.RandomInRange; i++)
             {
-                PrivateFields.HediffDefDatabase_defs.SetValue(def, def.modContentPack.AllDefs.Except(def));
+                float value = Rand.Value;
+                if (value < a / total)
+                {
+                    data.statOffsets.Add(StatOffsetsPool.RandomElement().GetStatModifierFromKVP());
+                }
+                else if (value < (a + b) / total)
+                {
+                    data.statFactors.Add(StatFactorsPool.RandomElement().GetStatModifierFromKVP());
+                }
+                else
+                {
+                    if (data.trait != null || vision?.trait != null)
+                    {
+                        i--;
+                        continue; // bad solution but okay.
+                    }
+                    data.trait = DefDatabase<TraitDef>.AllDefsListForReading.RandomElement();
+                    data.traitDegree = data.trait.degreeDatas.RandomElement().degree;
+                }
             }
-        }*/
+            /*for (int i = 0; i < offsetsRange.RandomInRange; i++)
+            {
+                data.statOffsets.Add(StatOffsetsPool.RandomElement().GetStatModifierFromKVP());
+            }
+            for (int i = 0; i < factorsRange.RandomInRange; i++)
+            {
+                data.statFactors.Add(StatFactorsPool.RandomElement().GetStatModifierFromKVP());
+            }*/
+            return data;
+        }
     }
 
     [Flags]

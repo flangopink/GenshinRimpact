@@ -11,7 +11,7 @@ namespace Rimpact
         public string label;
         public string description;
         //public Color color;
-        public HediffDataStage stage;
+        public HediffStageData stage;
         public VisionDef visionDef;
         public bool extraString;
 
@@ -31,23 +31,27 @@ namespace Rimpact
         }
     }*/
 
-    public class HediffDataStage : IExposable
+    public class HediffStageData : IExposable
     {
         public Pawn pawn;
         public List<HediffDataStatModifier> statOffsets = [];
         public List<HediffDataStatModifier> statFactors = [];
         public VisionDef vision;
+        public TraitDef trait;
+        public int traitDegree;
 
-        public HediffDataStage() { }
-        public HediffDataStage(Pawn p, HediffStage hs, VisionDef v = null)
+        public HediffStageData() { }
+        public HediffStageData(Pawn p, HediffStage hs, TraitDef t, int tdeg = 0, VisionDef v = null)
         {
             pawn = p;
             vision = v;
-            for (int i = 0; i < statOffsets.Count; i++)
+            trait = t;
+            traitDegree = tdeg;
+            for (int i = 0; i < hs.statOffsets.Count; i++)
             {
                 statOffsets.Add(new() { stat = hs.statOffsets[i].stat, value = hs.statOffsets[i].value });
             }
-            for (int i = 0; i < statFactors.Count; i++)
+            for (int i = 0; i < hs.statFactors.Count; i++)
             {
                 statOffsets.Add(new() { stat = hs.statFactors[i].stat, value = hs.statFactors[i].value });
             }
@@ -71,12 +75,19 @@ namespace Rimpact
             return stage;
         }
 
+        public override string ToString()
+        {
+            return $"Pawn: {pawn}, Vision: {vision}, Trait: {trait.DataAtDegree(traitDegree)}, {statOffsets.Count} Offsets: {statOffsets.ToStringSafeEnumerable()}, {statFactors.Count} Factors: {statFactors.ToStringSafeEnumerable()}";
+        }
+
         public void ExposeData()
         {
             Scribe_References.Look(ref pawn, "pawn");
             Scribe_Collections.Look(ref statOffsets, "statOffsets", LookMode.Deep);
             Scribe_Collections.Look(ref statFactors, "statFactors", LookMode.Deep);
             Scribe_Defs.Look(ref vision, "vision");
+            Scribe_Defs.Look(ref trait, "trait");
+            Scribe_Values.Look(ref traitDegree, "traitDegree");
         }
     }
     public class HediffDataStatModifier : IExposable
@@ -85,6 +96,11 @@ namespace Rimpact
         public float value;
 
         public StatModifier ToStatModifier() => new() { stat = stat, value = value };
+
+        public override string ToString()
+        {
+            return $"Stat: {stat}, Value: {value}";
+        }
 
         public void ExposeData()
         {

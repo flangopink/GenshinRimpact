@@ -91,6 +91,7 @@
     <Compile Include="HediffComps\HediffComp_EnergyCostMultiplier.cs" />
     <Compile Include="Misc\HediffData.cs" />
     <Compile Include="Misc\HediffDynamic.cs" />
+    <Compile Include="Patches\Patch_Pawn_EquipmentTracker_GetGizmos.cs" />
     <Compile Include="Rimpact_Harmony.cs" />
     <Compile Include="HediffComps\HediffComp_AoE.cs" />
     <Compile Include="HediffComps\HediffComp_ChargingAbility.cs" />
@@ -116,7 +117,6 @@
     <Compile Include="Misc\BattleLogEntry_DamageTakenAbility.cs" />
     <Compile Include="Misc\BulletBezier.cs" />
     <Compile Include="Misc\PawnFlyerExtended.cs" />
-    <Compile Include="Misc\GR_Cache.cs" />
     <Compile Include="Misc\PawnRenderSubWorker_InvisibilityCheck.cs" />
     <Compile Include="ModExtensions\ModExt_Bezier.cs" />
     <Compile Include="ModExtensions\ModExt_Element.cs" />
@@ -147,6 +147,7 @@
     <Compile Include="ThingComps\CompThingSpawner.cs" />
     <Compile Include="UI\Command_AbilityCooldownTimer.cs" />
     <Compile Include="UI\Command_Invisible.cs" />
+    <Compile Include="UI\Dialog_ChooseHediff.cs" />
     <Compile Include="UI\Gizmo_AbilityStacks.cs" />
     <Compile Include="UI\Gizmo_EnergyPool.cs" />
     <Compile Include="UI\Gizmo_HediffEnergyShieldStatus.cs" />

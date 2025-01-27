@@ -36,7 +36,7 @@ namespace Rimpact
             Hediff h = p.health.GetOrAddHediff(Rimpact_DefOf.GR_Hediff_Dynamic);
             if (h != null && h is HediffDynamic hdyn)
             {
-                HediffDataStage stageData = new()
+                HediffStageData stageData = new()
                 {
                     pawn = p,
                     statOffsets =

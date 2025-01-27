@@ -19,17 +19,19 @@ namespace Rimpact
         public new CompProperties_AbilityEnergyUser Props => (CompProperties_AbilityEnergyUser)props;
 
         public MapComponent_EnergyPool pool;
+        private Map map;
         private int usageTickInterval = -1;
         private int sign;
         private int usageTicksLeft;
         private bool startedCasting;
         private bool alreadyUsed;
 
+        private bool HasPawn => parent.pawn != null;
         public float EnergyUsage
         {
             get
             {
-                if (Props.energyUsage > 0 && pool != null && pool.PawnEnergyCostMultipliers.TryGetValue(parent.pawn, out float mult))
+                if (HasPawn && Props.energyUsage > 0 && pool != null && pool.PawnEnergyCostMultipliers.TryGetValue(parent.pawn, out float mult))
                 {
                     return Props.energyUsage * mult;
                 }
@@ -40,14 +42,21 @@ namespace Rimpact
         //public override bool CanCast => pool.energy - EnergyUsage >= 0;
         public string EnergyTooltip => EnergyUsage > 0 ? "GR_EnergyCost".Translate(EnergyUsage.ToString().Colorize(ColoredText.TipSectionTitleColor)).Resolve()
                                                        : "GR_EnergyGain".Translate((-EnergyUsage).ToString().Colorize(ColoredText.ExpectationsColor)).Resolve();
-
+        
         public override void Initialize(AbilityCompProperties props)
         {
             base.Initialize(props);
-            pool = parent.pawn.MapHeld.GetComponent<MapComponent_EnergyPool>();
+            if (map == null) UpdateMapPool();
+            else pool = map.GetComponent<MapComponent_EnergyPool>();
             if (pool == null) Utils.LogError($"Error in {parent}: MapComponent_EnergyPool is null.");
             usageTickInterval = Props.instaUse ? 0 : Mathf.Max(1, (int)(parent.VerbProperties[0].warmupTime.SecondsToTicks() / Mathf.Abs(EnergyUsage)));
             sign = Math.Sign(EnergyUsage);
+        }
+
+        private void UpdateMapPool() 
+        {
+            map = parent.pawn == null ? Find.CurrentMap : parent.pawn.MapHeld;
+            pool = map.GetComponent<MapComponent_EnergyPool>();
         }
 
         public override IEnumerable<Gizmo> CompGetGizmosExtra()
@@ -59,6 +68,13 @@ namespace Rimpact
 
         public override void CompTick()
         {
+            if (Find.TickManager.TicksGame % 300 == 0)
+            {
+                if (pool == null || pool.map != Find.CurrentMap)
+                {
+                    UpdateMapPool();
+                }
+            }
             if (pool != null)
             {
                 if (!startedCasting && parent.Casting)
@@ -138,7 +154,8 @@ namespace Rimpact
 
         public override void PostExposeData()
         {
-            Scribe_Values.Look(ref alreadyUsed, "alreadyUsed", false);
+            Scribe_References.Look(ref map, "map");
+            Scribe_Values.Look(ref startedCasting, "alreadyUsed", false);
             Scribe_Values.Look(ref startedCasting, "alreadyUsed", false);
             Scribe_Values.Look(ref usageTicksLeft, "usageTicksLeft", 0);
         }
