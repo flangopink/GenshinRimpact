@@ -1,5 +1,7 @@
 # Rimpact Ability Framework / GenshinRimpact
 
+### [Check out the wiki!](./wiki)
+
 Abilities, hediffs, comps, elemental reactions*, map-wide shared energy pool.
 
 
