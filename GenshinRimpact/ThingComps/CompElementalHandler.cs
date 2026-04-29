@@ -15,7 +15,7 @@ namespace Rimpact
 
         public void ApplyElement(ElementDef element, Thing instigator = null) 
         {
-            if (element != null) 
+            if (element == null) 
             { 
                 Log.Error("Tried applying a null element.");
                 return;

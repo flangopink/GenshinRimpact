@@ -155,8 +155,8 @@ namespace Rimpact
         public override void PostExposeData()
         {
             Scribe_References.Look(ref map, "map");
-            Scribe_Values.Look(ref startedCasting, "alreadyUsed", false);
-            Scribe_Values.Look(ref startedCasting, "alreadyUsed", false);
+            Scribe_Values.Look(ref startedCasting, "startedCasting", false);
+            Scribe_Values.Look(ref alreadyUsed, "alreadyUsed", false);
             Scribe_Values.Look(ref usageTicksLeft, "usageTicksLeft", 0);
         }
     }

@@ -132,21 +132,35 @@ namespace Rimpact
         #endregion
 
         #region -- Logs --
-        public static void LogMessage(string str) => Log.Message("<color=#f4abba>[Rimpact]</color> " + str);
-        public static void LogWarning(string str) => Log.Warning("<color=#f4abba>[Rimpact]</color> " + str);
-        public static void LogError(string str) => Log.Error("<color=#f4abba>[Rimpact]</color> " + str);
-        public static void LogErrorOnce(string str, int key) => Log.ErrorOnce("<color=#f4abba>[Rimpact]</color> " + str, key);
+        public static void LogMessage(string str) => Log.Message($"<color=#f4abba>[Rimpact]</color> {str}");
+        public static void LogWarning(string str) => Log.Warning($"<color=#f4abba>[Rimpact]</color> {str}");
+        public static void LogError(string str) => Log.Error($"<color=#f4abba>[Rimpact]</color> {str}");
+        public static void LogErrorOnce(string str, int key) => Log.ErrorOnce($"<color=#f4abba>[Rimpact]</color> {str}", key);
         #endregion
 
+        /// <summary>
+        /// Gets the elemental reaction definition for a combination of elements and status.
+        /// </summary>
+        /// <param name="appliedElement">The element being applied.</param>
+        /// <param name="otherElement">The existing element on the target.</param>
+        /// <param name="status">The current status effect.</param>
+        /// <returns>The matching elemental reaction definition, or null if none found.</returns>
         public static ElementalReactionDef GetReaction(ElementDef appliedElement, ElementDef otherElement, Status status)
         {
-            ElementalReactionDef result = null;
-            if (appliedElement != null && appliedElement.reactsWith != null)
+            if (appliedElement == null)
             {
-                var combo = appliedElement.reactsWith.FirstOrFallback(x => x.element == otherElement || x.status == status);
-                if (combo.Equals(default(ElementCombo))) return null;
-                result = combo.reaction;
+                return null;
             }
+
+            if (appliedElement.reactsWith == null || appliedElement.reactsWith.Count == 0)
+            {
+                return null;
+            }
+
+            ElementalReactionDef result = null;
+            var combo = appliedElement.reactsWith.FirstOrFallback(x => x.element == otherElement || x.status == status);
+            if (combo.Equals(default(ElementCombo))) return null;
+            result = combo.reaction;
             return result;
         }
 
